@@ -1,55 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { translations } from '../translations.js'
 
 const LanguageContext = createContext(null)
-
-// Простые переводы для начала (потом можно вынести в отдельные JSON файлы)
-export const translations = {
-  RU: {
-    nav_home: 'Главная',
-    nav_events: 'Мероприятия',
-    nav_teams: 'Команды',
-    nav_news: 'Новости',
-    nav_profile: 'Профиль',
-    btn_register: 'Зарегистрироваться',
-    menu_profile: '👤 Мой профиль',
-    menu_dev: '🛠️ Панель разработчика',
-    menu_team: '🛡️ Управление командой',
-    menu_logout: '🚪 Выйти',
-    footer_rights: '© 2026 Jas Volunteers. Все права защищены.',
-    footer_bug: 'Сообщить об ошибке 🐛',
-    footer_support: 'Поддержать проект ❤️'
-  },
-  KZ: {
-    nav_home: 'Басты бет',
-    nav_events: 'Іс-шаралар',
-    nav_teams: 'Командалар',
-    nav_news: 'Жаңалықтар',
-    nav_profile: 'Профиль',
-    btn_register: 'Тіркелу',
-    menu_profile: '👤 Менің профилім',
-    menu_dev: '🛠️ Әзірлеуші тақтасы',
-    menu_team: '🛡️ Команданы басқару',
-    menu_logout: '🚪 Шығу',
-    footer_rights: '© 2026 Jas Volunteers. Барлық құқықтар қорғалған.',
-    footer_bug: 'Қатені хабарлау 🐛',
-    footer_support: 'Жобаны қолдау ❤️'
-  },
-  EN: {
-    nav_home: 'Home',
-    nav_events: 'Events',
-    nav_teams: 'Teams',
-    nav_news: 'News',
-    nav_profile: 'Profile',
-    btn_register: 'Sign Up',
-    menu_profile: '👤 My Profile',
-    menu_dev: '🛠️ Developer Panel',
-    menu_team: '🛡️ Manage Team',
-    menu_logout: '🚪 Logout',
-    footer_rights: '© 2026 Jas Volunteers. All rights reserved.',
-    footer_bug: 'Report a bug 🐛',
-    footer_support: 'Support the project ❤️'
-  }
-}
 
 export function LanguageProvider({ children }) {
   // Ищем сохраненный язык в LocalStorage, по умолчанию RU

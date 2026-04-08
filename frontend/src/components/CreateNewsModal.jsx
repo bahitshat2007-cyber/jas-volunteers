@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
   const { user, profile } = useAuth()
+  const { t } = useLanguage()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [type, setType] = useState('team')
@@ -59,8 +61,8 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
     } catch (err) {
       console.error('Error saving news:', err)
       setError(editingNews 
-        ? 'Не удалось обновить новость. Проверьте права доступа.' 
-        : 'Не удалось опубликовать новость. Проверьте права доступа.')
+        ? t('err_edit_news') 
+        : t('err_create_news'))
     } finally {
       setLoading(false)
     }
@@ -72,10 +74,10 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
         <div className="flex justify-between items-start mb-8">
           <div>
             <h3 className="text-3xl font-brand text-gray-900 mb-1">
-              {editingNews ? 'Редактировать' : 'Создать новость'}
+              {editingNews ? t('edit_news') : t('create_news')}
             </h3>
             <p className="text-sm text-gray-500">
-              {editingNews ? 'Внесите изменения в публикацию' : 'Поделитесь важным событием с волонтерами'}
+              {editingNews ? t('edit_news_desc') : t('create_news_desc')}
             </p>
           </div>
           <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-xl text-gray-400 transition-colors">✕</button>
@@ -89,19 +91,19 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
           )}
 
           <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 ml-1">Заголовок новости</label>
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 ml-1">{t('news_title_label')}</label>
             <input 
               type="text" 
               required 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
-              placeholder="Название новости..." 
+              placeholder={t('news_title_placeholder')}
               className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm font-bold placeholder:font-normal"
             />
           </div>
 
           <div>
-             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3 ml-1">Тип новости (Визуальный стиль)</label>
+             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3 ml-1">{t('news_type_label')}</label>
              <div className="grid grid-cols-3 gap-3">
                 <button 
                   type="button"
@@ -109,7 +111,7 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
                   className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${type === 'team' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
                 >
                    <span className="text-xl">🏠</span>
-                   <span className="text-[10px] font-black uppercase tracking-tighter">Командная</span>
+                   <span className="text-[10px] font-black uppercase tracking-tighter">{t('type_team')}</span>
                 </button>
                 <button 
                   type="button"
@@ -117,7 +119,7 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
                   className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${type === 'org' ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
                 >
                    <span className="text-xl">🌍</span>
-                   <span className="text-[10px] font-black uppercase tracking-tighter">Орг-масштаб</span>
+                   <span className="text-[10px] font-black uppercase tracking-tighter">{t('type_org')}</span>
                 </button>
                 <button 
                   type="button"
@@ -125,18 +127,18 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
                   className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${type === 'epic' ? 'border-purple-600 bg-slate-900 text-purple-400 shadow-xl' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
                 >
                    <span className="text-xl">⚡️</span>
-                   <span className="text-[10px] font-black uppercase tracking-tighter">EPIC</span>
+                   <span className="text-[10px] font-black uppercase tracking-tighter">{t('type_epic')}</span>
                 </button>
              </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 ml-1">Текст новости</label>
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 ml-1">{t('news_content_label')}</label>
             <textarea 
               required 
               value={content} 
               onChange={e => setContent(e.target.value)} 
-              placeholder="Подробное описание..." 
+              placeholder={t('news_content_placeholder')}
               className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all resize-none h-40 text-sm leading-relaxed"
             />
           </div>
@@ -146,7 +148,7 @@ function CreateNewsModal({ onClose, onCreated, editingNews = null }) {
             disabled={loading} 
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-2xl shadow-indigo-200 transition-all active:scale-95 disabled:opacity-50 text-xs"
           >
-            {loading ? 'СОХРАНЕНИЕ...' : (editingNews ? 'СОХРАНИТЬ ИЗМЕНЕНИЯ 💾' : 'ОПУБЛИКОВАТЬ ⚡️')}
+            {loading ? t('btn_saving') : (editingNews ? t('btn_save_changes') : t('btn_publish'))}
           </button>
         </form>
       </div>

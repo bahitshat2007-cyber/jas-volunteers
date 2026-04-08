@@ -1,6 +1,8 @@
 import React from 'react'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }) => {
+  const { t } = useLanguage()
   const isLong = news.content.length > 200
   const displayContent = isLong ? news.content.substring(0, 200) + '...' : news.content
   const canManage = currentUserId === news.author_id || isAdmin
@@ -10,14 +12,14 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
       <button 
         onClick={(e) => { e.stopPropagation(); onEdit(news); }}
         className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-xs hover:bg-white/20 transition-all text-white shadow-lg"
-        title="Редактировать"
+        title={t('title_edit')}
       >
         ✏️
       </button>
       <button 
         onClick={(e) => { e.stopPropagation(); onDelete(news.id); }}
         className="w-8 h-8 rounded-full bg-red-500/20 backdrop-blur-md border border-red-500/30 flex items-center justify-center text-xs hover:bg-red-500/40 transition-all text-white shadow-lg"
-        title="Удалить"
+        title={t('title_delete')}
       >
         🗑️
       </button>
@@ -64,7 +66,7 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
                 onClick={() => onReadMore(news)} 
                 className="bg-white text-slate-950 px-6 py-2.5 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-indigo-400 hover:text-white transition-all transform active:scale-95 shadow-xl"
               >
-                  {isLong ? 'ЧИТАТЬ ПОЛНОСТЬЮ⚡️' : 'ОТКРЫТЬ'}
+                  {isLong ? t('btn_read_full') : t('btn_open')}
               </button>
            </div>
         </div>
@@ -77,8 +79,8 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
       <div className="news-card-responsive bg-white rounded-[2.5rem] p-8 card-shadow border-2 border-[var(--color-primary)] relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 flex flex-col">
         {canManage && (
           <div className="absolute top-4 right-4 flex gap-2 z-20">
-            <button onClick={(e) => { e.stopPropagation(); onEdit(news); }} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs hover:bg-gray-200 transition-all border border-gray-200">✏️</button>
-            <button onClick={(e) => { e.stopPropagation(); onDelete(news.id); }} className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-xs hover:bg-red-100 transition-all border border-red-100">🗑️</button>
+            <button title={t('title_edit')} onClick={(e) => { e.stopPropagation(); onEdit(news); }} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs hover:bg-gray-200 transition-all border border-gray-200">✏️</button>
+            <button title={t('title_delete')} onClick={(e) => { e.stopPropagation(); onDelete(news.id); }} className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-xs hover:bg-red-100 transition-all border border-red-100">🗑️</button>
           </div>
         )}
         
@@ -90,7 +92,7 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
               {news.teams?.logo_url ? <img src={news.teams.logo_url} className="w-full h-full object-cover rounded-lg" /> : <span className="text-lg">📢</span>}
            </div>
            <div>
-              <p className="text-[10px] font-black text-[var(--color-primary)] uppercase tracking-widest leading-none mb-1">Global Update</p>
+              <p className="text-[10px] font-black text-[var(--color-primary)] uppercase tracking-widest leading-none mb-1">{t('global_update')}</p>
               <p className="text-xs font-bold text-gray-500">{news.teams?.name || 'Jas Volunteers'}</p>
            </div>
         </div>
@@ -101,7 +103,7 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
         <div className="flex items-center justify-between mt-auto">
            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(news.created_at).toLocaleDateString()}</span>
            <button onClick={() => onReadMore(news)} className="text-[var(--color-primary)] font-black text-[11px] uppercase tracking-widest hover:underline px-2">
-              Подробнее →
+              {t('btn_details_arrow')}
            </button>
         </div>
       </div>
@@ -113,8 +115,8 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
     <div className="news-card-responsive bg-white rounded-[2.5rem] p-7 card-shadow border border-gray-100 hover:border-gray-200 transition-all group flex flex-col relative">
       {canManage && (
           <div className="absolute top-4 right-4 flex gap-2 z-20">
-            <button onClick={(e) => { e.stopPropagation(); onEdit(news); }} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-xs hover:bg-gray-100 transition-all border border-gray-100">✏️</button>
-            <button onClick={(e) => { e.stopPropagation(); onDelete(news.id); }} className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-xs hover:bg-red-100 transition-all border border-red-200">🗑️</button>
+            <button title={t('title_edit')} onClick={(e) => { e.stopPropagation(); onEdit(news); }} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-xs hover:bg-gray-100 transition-all border border-gray-100">✏️</button>
+            <button title={t('title_delete')} onClick={(e) => { e.stopPropagation(); onDelete(news.id); }} className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-xs hover:bg-red-100 transition-all border border-red-200">🗑️</button>
           </div>
         )}
 
@@ -122,7 +124,7 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-xs opacity-60">
             {news.teams?.logo_url ? <img src={news.teams.logo_url} className="w-full h-full object-cover rounded-lg" /> : '👥'}
          </div>
-         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate max-w-[120px]">{news.teams?.name || 'Team News'}</span>
+         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate max-w-[120px]">{news.teams?.name || t('team_news_fallback')}</span>
       </div>
 
       <h3 className="text-lg font-bold text-gray-800 mb-2 leading-tight">{news.title}</h3>
@@ -131,7 +133,7 @@ const NewsCard = ({ news, onReadMore, onEdit, onDelete, currentUserId, isAdmin }
       <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
          <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">{new Date(news.created_at).toLocaleDateString()}</span>
          <button onClick={() => onReadMore(news)} className="text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors">
-           Подробнее
+           {t('btn_details')}
          </button>
       </div>
     </div>

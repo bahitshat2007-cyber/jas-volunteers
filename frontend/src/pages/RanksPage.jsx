@@ -3,84 +3,86 @@ import {
   RankNovice, RankVolunteer, RankActivist,
   RankVeteran, RankChampion, RankLegend
 } from '../components/Ornaments.jsx'
-
-const RANKS = [
-  {
-    id: 'novice',
-    name: 'Новичок',
-    hours: '0+',
-    color: '#9ca3af',
-    Icon: RankNovice,
-    perk: 'Первый шаг в мире добра. Открывает доступ к базовым мероприятиям.',
-    style: 'border-gray-200 bg-gray-50'
-  },
-  {
-    id: 'volunteer',
-    name: 'Доброволец',
-    hours: '50+',
-    color: '#10b981',
-    Icon: RankVolunteer,
-    perk: 'Вы уже не случайный гость. Приоритетный отбор на популярные ивенты.',
-    style: 'border-emerald-200 bg-emerald-50 text-emerald-700'
-  },
-  {
-    id: 'activist',
-    name: 'Активист',
-    hours: '200+',
-    color: '#3b82f6',
-    Icon: RankActivist,
-    perk: 'Вас знают в лицо. Возможность помогать в организации малых групп.',
-    style: 'border-blue-200 bg-blue-50 text-blue-700'
-  },
-  {
-    id: 'veteran',
-    name: 'Ветеран',
-    hours: '500+',
-    color: '#8b5cf6',
-    Icon: RankVeteran,
-    perk: 'Опытный боец. Эксклюзивный мерч и доступ к закрытым встречам лидеров.',
-    style: 'border-violet-200 bg-violet-50 text-violet-700'
-  },
-  {
-    id: 'champion',
-    name: 'Чемпион',
-    hours: '1000+',
-    color: '#f97316',
-    Icon: RankChampion,
-    perk: 'Мастер своего дела. Право координировать целые направления.',
-    style: 'border-orange-200 bg-orange-50 text-orange-700'
-  },
-  {
-    id: 'legend',
-    name: 'Легенда',
-    hours: '2500+',
-    color: '#ef4444',
-    Icon: RankLegend,
-    perk: 'Живой символ Jas Volunteers. Право вето, личный профиль в Зале Славы и вечный почет.',
-    style: 'border-red-200 bg-red-50 text-red-600'
-  }
-]
-
-const ROLES = [
-  {
-    title: '🙋 Волонтер',
-    desc: 'Сердце платформы. Участвует в ивентах, копит часы и растет в рангах.',
-    powers: ['Запись на любые ивенты', 'Получение ачивок', 'Участие в жизни клана']
-  },
-  {
-    title: '⚖️ Зам. координатора',
-    desc: 'Правая рука лидера. Помогает следить за порядком и новостями.',
-    powers: ['Публикация новостей', 'Помощь в управлении участниками', 'Прием заявок']
-  },
-  {
-    title: '🛡️ Координатор',
-    desc: 'Глава клана. Несет ответственность за весь коллектив.',
-    powers: ['Полное управление составом', 'Начисление бонусных часов', 'Редактирование данных клана']
-  }
-]
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 function RanksPage() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
+
+  const RANKS = [
+    {
+      id: 'novice',
+      name: t('rank_novice'),
+      hours: '0+',
+      color: '#9ca3af',
+      Icon: RankNovice,
+      perk: t('rank_novice_perk'),
+      style: 'border-gray-200 bg-gray-50'
+    },
+    {
+      id: 'volunteer',
+      name: t('rank_volunteer'),
+      hours: '50+',
+      color: '#10b981',
+      Icon: RankVolunteer,
+      perk: t('rank_volunteer_perk'),
+      style: 'border-emerald-200 bg-emerald-50 text-emerald-700'
+    },
+    {
+      id: 'activist',
+      name: t('rank_activist'),
+      hours: '200+',
+      color: '#3b82f6',
+      Icon: RankActivist,
+      perk: t('rank_activist_perk'),
+      style: 'border-blue-200 bg-blue-50 text-blue-700'
+    },
+    {
+      id: 'veteran',
+      name: t('rank_veteran'),
+      hours: '500+',
+      color: '#8b5cf6',
+      Icon: RankVeteran,
+      perk: t('rank_veteran_perk'),
+      style: 'border-violet-200 bg-violet-50 text-violet-700'
+    },
+    {
+      id: 'champion',
+      name: t('rank_champion'),
+      hours: '1000+',
+      color: '#f97316',
+      Icon: RankChampion,
+      perk: t('rank_champion_perk'),
+      style: 'border-orange-200 bg-orange-50 text-orange-700'
+    },
+    {
+      id: 'legend',
+      name: t('rank_legend'),
+      hours: '2500+',
+      color: '#ef4444',
+      Icon: RankLegend,
+      perk: t('rank_legend_perk'),
+      style: 'border-red-200 bg-red-50 text-red-600'
+    }
+  ]
+
+  const ROLES = [
+    {
+      title: t('role_volunteer'),
+      desc: t('role_vol_desc'),
+      powers: [t('role_vol_p1'), t('role_vol_p2'), t('role_vol_p3')]
+    },
+    {
+      title: t('role_sub_coordinator'),
+      desc: t('role_sub_desc'),
+      powers: [t('role_sub_p1'), t('role_sub_p2'), t('role_sub_p3')]
+    },
+    {
+      title: t('role_coordinator'),
+      desc: t('role_coord_desc'),
+      powers: [t('role_coord_p1'), t('role_coord_p2'), t('role_coord_p3')]
+    }
+  ]
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-20 animate-fade-in">
@@ -90,11 +92,11 @@ function RanksPage() {
           onClick={() => navigate(-1)} 
           className="btn btn-ghost btn-sm rounded-xl mb-4"
         >
-          ← Назад в профиль
+          {t('btn_back_profile')}
         </button>
-        <h1 className="text-4xl font-brand text-[var(--color-text-heading)]">Иерархия Благодетеля</h1>
+        <h1 className="text-4xl font-brand text-[var(--color-text-heading)]">{t('hierarchy_title')}</h1>
         <p className="text-[var(--color-text-body)] max-w-xl mx-auto">
-          Твои добрые дела превращаются в опыт. Чем выше ранг, тем больше влияния ты имеешь на мир вокруг.
+          {t('hierarchy_desc')}
         </p>
       </section>
 
@@ -111,7 +113,7 @@ function RanksPage() {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
                 <h3 className="text-xl font-black uppercase tracking-tight">{rank.name}</h3>
-                <span className="text-xs font-bold opacity-60">от {rank.hours} ч.</span>
+                <span className="text-xs font-bold opacity-60">{t('hours_from')} {rank.hours} {t('rank_hours')}</span>
               </div>
               <p className="text-xs leading-relaxed opacity-80">{rank.perk}</p>
               
@@ -134,8 +136,8 @@ function RanksPage() {
       {/* Roles Section */}
       <section className="space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-brand text-[var(--color-text-heading)] mb-2">Роли в системе</h2>
-          <p className="text-sm text-[var(--color-text-body)] opacity-70">Статус определяет твои возможности на портале</p>
+          <h2 className="text-3xl font-brand text-[var(--color-text-heading)] mb-2">{t('roles_system_title')}</h2>
+          <p className="text-sm text-[var(--color-text-body)] opacity-70">{t('roles_system_desc')}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -146,7 +148,7 @@ function RanksPage() {
                 {role.desc}
               </p>
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Способности:</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{t('abilities_label')}</p>
                 {role.powers.map(p => (
                   <div key={p} className="flex items-center gap-2 text-[11px] font-bold text-gray-700">
                     <span className="text-green-500">✔</span> {p}
@@ -161,15 +163,15 @@ function RanksPage() {
       {/* Clash style CTA */}
       <section className="bg-[var(--color-primary)] rounded-[3rem] p-10 text-white text-center space-y-6 shadow-2xl shadow-red-200">
         <div className="text-4xl">🚀</div>
-        <h2 className="text-3xl font-brand">Твой путь только начинается!</h2>
+        <h2 className="text-3xl font-brand">{t('cta_path_title')}</h2>
         <p className="opacity-90 max-w-lg mx-auto text-sm">
-          Каждый час помощи приближает тебя к статусу Легенды. Самые крутые волонтеры получают доступ к эксклюзивным стажировкам и рекомендациям.
+          {t('cta_path_desc')}
         </p>
         <button 
           onClick={() => navigate('/events')}
           className="btn btn-lg bg-white text-[var(--color-primary)] border-none rounded-2xl hover:scale-105 active:scale-95 transition-all font-black uppercase tracking-widest text-xs px-10"
         >
-          За работу, боец! 🛠️
+          {t('btn_to_work')}
         </button>
       </section>
     </div>

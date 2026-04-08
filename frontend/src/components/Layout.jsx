@@ -79,7 +79,7 @@ function Layout() {
                   {(profile?.first_name?.[0] || user.email?.[0] || '?').toUpperCase()}
                 </div>
                 <span className="hidden sm:inline text-sm font-medium text-[var(--color-text-heading)]">
-                  {profile?.first_name || 'Профиль'}
+                  {profile?.first_name || t('nav_profile')}
                 </span>
               </NavLink>
             ) : (
@@ -101,9 +101,9 @@ function Layout() {
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--color-text-body)] text-center md:text-left">
           <p className="flex items-center justify-center md:justify-start gap-1.5">{t('footer_rights')} <SakuraEasterEgg /></p>
           <div className="flex flex-wrap justify-center items-center gap-4">
-            <NavLink to="/creator" className="text-xs px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-md hover:scale-105 transition-transform">✨ Создатель платформы</NavLink>
-            <button onClick={() => setIsReportOpen(true)} className="btn-jas-ghost text-xs px-2 py-1">{t('footer_bug') || 'Сообщить об ошибке'}</button>
-            <button onClick={() => setIsSupportOpen(true)} className="btn-jas-ghost text-xs px-2 py-1 font-bold text-[var(--color-primary)]">{t('footer_support') || 'Поддержать проект ❤️'}</button>
+            <NavLink to="/creator" className="text-xs px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-md hover:scale-105 transition-transform">{t('footer_creator')}</NavLink>
+            <button onClick={() => setIsReportOpen(true)} className="btn-jas-ghost text-xs px-2 py-1">{t('footer_bug')}</button>
+            <button onClick={() => setIsSupportOpen(true)} className="btn-jas-ghost text-xs px-2 py-1 font-bold text-[var(--color-primary)]">{t('footer_support')}</button>
           </div>
         </div>
       </footer>

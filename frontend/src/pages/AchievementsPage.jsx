@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import { supabase } from '../lib/supabase.js'
 import LoadingScreen from '../components/LoadingScreen.jsx'
 
 function AchievementsPage() {
   const { user, loading } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [allAchievements, setAllAchievements] = useState([])
   const [userAchievementIds, setUserAchievementIds] = useState(new Set())
@@ -44,7 +46,7 @@ function AchievementsPage() {
           border: 'border-amber-400',
           bg: 'bg-amber-50',
           shadow: 'shadow-[0_0_15px_rgba(251,191,36,0.3)]',
-          label: 'Легендарное',
+          label: t('rarity_legendary'),
           textColor: 'text-amber-700'
         }
       case 'event_based': // Rare/Purple
@@ -52,7 +54,7 @@ function AchievementsPage() {
           border: 'border-purple-400',
           bg: 'bg-purple-50',
           shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.2)]',
-          label: 'Редкое',
+          label: t('rarity_rare'),
           textColor: 'text-purple-700'
         }
       default: // Classic/Common
@@ -60,22 +62,22 @@ function AchievementsPage() {
           border: 'border-blue-400',
           bg: 'bg-blue-50',
           shadow: '',
-          label: 'Обычное',
+          label: t('rarity_common'),
           textColor: 'text-blue-700'
         }
     }
   }
 
   if (loading || fetching) {
-    return <LoadingScreen message="Открываем книгу достижений..." />
+    return <LoadingScreen message={t('achievements_loading')} />
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-brand text-[var(--color-text-heading)]">Зал славы</h1>
-        <p className="text-[var(--color-text-body)]">Твои достижения и будущие вершины</p>
+        <h1 className="text-3xl font-brand text-[var(--color-text-heading)]">{t('achievements_title')}</h1>
+        <p className="text-[var(--color-text-body)]">{t('achievements_subtitle')}</p>
       </div>
 
       {/* Categories */}
@@ -113,12 +115,12 @@ function AchievementsPage() {
 
                 {!isUnlocked && (
                   <div className="mt-2 text-[10px] font-medium text-gray-400 flex items-center gap-1">
-                    <span>🔒 Не открыто</span>
+                    <span>{t('status_locked')}</span>
                   </div>
                 )}
                 {isUnlocked && (
                   <div className={`mt-2 text-[10px] font-bold ${styles.textColor} flex items-center gap-1`}>
-                    <span>✨ Получено!</span>
+                    <span>{t('status_unlocked')}</span>
                   </div>
                 )}
               </div>
@@ -132,7 +134,7 @@ function AchievementsPage() {
           onClick={() => navigate('/profile')}
           className="btn btn-jas-ghost rounded-xl"
         >
-          ← Вернуться в профиль
+          {t('btn_back_profile')}
         </button>
       </div>
     </div>

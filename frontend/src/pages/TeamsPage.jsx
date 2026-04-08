@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import LoadingScreen from '../components/LoadingScreen.jsx'
 import TeamSwitchModal from '../components/TeamSwitchModal.jsx'
 
@@ -14,6 +15,7 @@ function TeamsPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [switchModal, setSwitchModal] = useState({ open: false, teamId: null, teamName: null, currentTeamName: '' })
   const { user, profile, refreshProfile } = useAuth()
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchTeams()
@@ -57,13 +59,13 @@ function TeamsPage() {
 
     const isCoordinator = profile?.role === 'coordinator'
     if (isCoordinator && currentTeamId) {
-       alert('Вы являетесь координатором своей команды. Передайте лидерство прежде чем вступать в новую.')
+       alert(t('err_coordinator_leave'))
        return
     }
 
     if (currentTeamId) {
       // Find current team name
-      const currentTeam = teams.find(t => t.id === currentTeamId) || { name: 'своей текущей команды' }
+      const currentTeam = teams.find(t => t.id === currentTeamId) || { name: t('current_team_fallback') }
       setSwitchModal({ 
         open: true, 
         teamId, 
@@ -86,7 +88,7 @@ function TeamsPage() {
       await refreshProfile()
       navigate(`/team/${teamId}`)
     } catch (err) {
-      alert('Ошибка: ' + err.message)
+      alert(t('err_default') + err.message)
     } finally {
       setIsProcessing(false)
       setSwitchModal({ open: false, teamId: null, teamName: null, currentTeamName: '' })
@@ -111,17 +113,17 @@ function TeamsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[var(--color-text-heading)]">🏆 Рейтинг команд</h1>
-        <span className="text-sm text-[var(--color-text-body)]">Обновление: {new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+        <h1 className="text-2xl font-bold text-[var(--color-text-heading)]">{t('teams_ranking')}</h1>
+        <span className="text-sm text-[var(--color-text-body)]">{t('updated_at')} {new Date().toLocaleDateString()}</span>
       </div>
 
-      {loading && <LoadingScreen message="Ранжирование кланов..." />}
+      {loading && <LoadingScreen message={t('loading_clans')} />}
 
       {!loading && (
         <>
           {showMock && (
             <div className="bg-yellow-50 text-yellow-800 rounded-xl px-4 py-3 text-sm">
-              ℹ️ База данных пока пуста. Показаны демо-данные. Данные появятся после того, как команды будут одобрены и волонтеры начнут регистрироваться.
+              {t('mock_db_warning')}
             </div>
           )}
 
@@ -138,7 +140,7 @@ function TeamsPage() {
                     <div className="text-4xl mb-1">{medals[i]}</div>
                     <h3 className="font-bold text-[var(--color-text-heading)] text-sm md:text-base leading-tight">{team.name}</h3>
                     <div className="text-2xl font-bold text-[var(--color-primary)] mt-2">{team.totalHours.toLocaleString()}</div>
-                    <div className="text-xs text-[var(--color-text-body)] mb-4">часов</div>
+                    <div className="text-xs text-[var(--color-text-body)] mb-4">{t('hours_unit')}</div>
                   </div>
                   
                   <button 
@@ -146,7 +148,7 @@ function TeamsPage() {
                     onClick={(e) => handleJoinTeam(e, team.id, team.name)}
                     className="w-full bg-[var(--color-primary)] text-white py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-red-700 disabled:opacity-50"
                   >
-                    {profile?.team_id === team.id ? '📍 Внутри' : (profile?.team_id ? '🔄 Сменить' : '➕ Вступить')}
+                    {profile?.team_id === team.id ? t('inside_badge') : (profile?.team_id ? t('switch_badge') : t('join_badge'))}
                   </button>
                 </div>
               ))}
@@ -160,11 +162,11 @@ function TeamsPage() {
                 <thead>
                   <tr className="bg-[var(--color-surface)] text-[var(--color-text-body)] text-sm">
                     <th className="font-medium">#</th>
-                    <th className="font-medium">Команда</th>
-                    <th className="font-medium text-center">Участников</th>
-                    <th className="font-medium text-center">Часов</th>
-                    <th className="font-medium text-center">Мероприятий</th>
-                    <th className="font-medium">Instagram</th>
+                    <th className="font-medium">{t('col_team')}</th>
+                    <th className="font-medium text-center">{t('col_members')}</th>
+                    <th className="font-medium text-center">{t('col_hours')}</th>
+                    <th className="font-medium text-center">{t('col_events')}</th>
+                    <th className="font-medium">{t('col_instagram')}</th>
                     <th className="font-medium"></th>
                   </tr>
                 </thead>
@@ -195,7 +197,7 @@ function TeamsPage() {
                             : 'bg-white text-[var(--color-primary)] border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white'
                           }`}
                         >
-                          {profile?.team_id === team.id ? 'УЖЕ ТУТ' : 'ВСТУПИТЬ'}
+                          {profile?.team_id === team.id ? t('already_here') : t('btn_join_upper')}
                         </button>
                       </td>
                     </tr>

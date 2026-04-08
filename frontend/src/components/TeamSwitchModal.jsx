@@ -1,6 +1,8 @@
 import React from 'react'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export default function TeamSwitchModal({ isOpen, onClose, onConfirm, teamName, currentTeamName }) {
+  const { t } = useLanguage()
   if (!isOpen) return null
 
   return (
@@ -12,19 +14,19 @@ export default function TeamSwitchModal({ isOpen, onClose, onConfirm, teamName, 
            <div className="relative z-10 text-5xl">🐿️</div>
         </div>
 
-        <h2 className="text-2xl font-brand text-gray-900 mb-4">Предаешь своих? 💔</h2>
+        <h2 className="text-2xl font-brand text-gray-900 mb-4">{t('switch_title')}</h2>
         
         <div className="space-y-4 mb-8">
           <p className="text-gray-600 text-sm leading-relaxed">
-            Твоя команда <span className="font-bold text-indigo-600">"{currentTeamName}"</span> рассчитывает на тебя. Уходя сейчас, ты оставляешь их в меньшинстве в гонке за звание лучших.
+            {t('switch_desc1')} <span className="font-bold text-indigo-600">"{currentTeamName}"</span> {t('switch_desc2')}
           </p>
           <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
             <p className="text-[11px] font-bold text-indigo-700 uppercase tracking-widest text-center">
-              Ты действительно хочешь уйти в "{teamName}"?
+              {t('switch_question')} "{teamName}"?
             </p>
           </div>
           <p className="text-[10px] text-gray-400 italic">
-            * Настоящие герои доводят начатое до конца вместе со своими братьями по оружию.
+            {t('switch_note')}
           </p>
         </div>
 
@@ -33,13 +35,13 @@ export default function TeamSwitchModal({ isOpen, onClose, onConfirm, teamName, 
             onClick={onClose}
             className="flex-1 py-4 rounded-2xl font-bold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all border border-gray-200"
           >
-            Остаться 🤝
+            {t('btn_stay')}
           </button>
           <button 
             onClick={onConfirm}
             className="flex-1 py-4 rounded-2xl font-bold text-sm bg-gray-900 text-white hover:bg-black active:scale-95 transition-all shadow-lg"
           >
-            Всё равно уйти
+            {t('btn_leave_anyway')}
           </button>
         </div>
       </div>

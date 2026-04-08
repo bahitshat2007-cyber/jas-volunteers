@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 function LoginPage() {
   const { signIn } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,7 +21,7 @@ function LoginPage() {
 
     if (authError) {
       setError(authError.message === 'Invalid login credentials'
-        ? 'Неверный email или пароль'
+        ? t('err_invalid_login')
         : authError.message
       )
       setLoading(false)
@@ -37,7 +39,7 @@ function LoginPage() {
           <h1 className="font-brand text-2xl text-[var(--color-text-heading)]">
             JAS <span className="text-[var(--color-primary)]">VOLUNTEERS</span>
           </h1>
-          <p className="text-[var(--color-text-body)] mt-1">Войдите в свой аккаунт</p>
+          <p className="text-[var(--color-text-body)] mt-1">{t('login_subtitle')}</p>
         </div>
 
         {/* Error */}
@@ -51,7 +53,7 @@ function LoginPage() {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="text-sm font-medium text-[var(--color-text-heading)] mb-1 block" htmlFor="login-email">
-              Email
+              {t('label_email')}
             </label>
             <input
               type="email"
@@ -65,7 +67,7 @@ function LoginPage() {
           </div>
           <div>
             <label className="text-sm font-medium text-[var(--color-text-heading)] mb-1 block" htmlFor="login-password">
-              Пароль
+              {t('label_password')}
             </label>
             <input
               type="password"
@@ -83,14 +85,14 @@ function LoginPage() {
             className="btn btn-jas w-full rounded-xl text-base"
             disabled={loading}
           >
-            {loading ? <span className="loading loading-spinner loading-sm"></span> : 'Войти'}
+            {loading ? <span className="loading loading-spinner loading-sm"></span> : t('btn_login')}
           </button>
         </form>
 
         <p className="text-center text-sm text-[var(--color-text-body)] mt-6">
-          Нет аккаунта?{' '}
+          {t('no_account')}{' '}
           <NavLink to="/register" className="text-[var(--color-primary)] font-medium hover:underline">
-            Зарегистрироваться
+            {t('btn_register')}
           </NavLink>
         </p>
       </div>

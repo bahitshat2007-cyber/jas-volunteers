@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function SupportModal({ isOpen, onClose }) {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [step, setStep] = useState(1) // 1: Method Select, 2: Payment Info, 3: Confirm, 4: Success
   const [method, setMethod] = useState('kaspi') // 'kaspi' | 'da'
   const [copied, setCopied] = useState(false)
@@ -38,7 +40,7 @@ export default function SupportModal({ isOpen, onClose }) {
   const handleSubmitConfirmation = async (e) => {
     e.preventDefault()
     if (!user) {
-      alert('Пожалуйста, войдите в аккаунт, чтобы мы знали кого поощрять!')
+      alert(t('err_login_support'))
       return
     }
     setLoading(true)
@@ -80,7 +82,7 @@ export default function SupportModal({ isOpen, onClose }) {
 
     } catch (err) {
       console.error('Error:', err)
-      alert('Ошибка: ' + err.message)
+      alert(t('err_general') + err.message)
     } finally {
       setLoading(false)
     }
@@ -107,9 +109,9 @@ export default function SupportModal({ isOpen, onClose }) {
                <div className="relative z-10 text-5xl">🐈☕</div>
             </div>
 
-            <h2 className="text-2xl font-brand text-gray-900 mb-2">Поддержать проект</h2>
+            <h2 className="text-2xl font-brand text-gray-900 mb-2">{t('support_title')}</h2>
             <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              Выбери удобный способ оплаты. Твоя помощь идет на оплату сервера и кофе для разработчика! ❤️
+              {t('support_subtitle')}
             </p>
 
             <div className="space-y-3 mb-6">
@@ -120,8 +122,8 @@ export default function SupportModal({ isOpen, onClose }) {
                 <div className="flex items-center gap-3">
                   <div className="text-2xl">🇰🇿</div>
                   <div className="text-left">
-                    <div className="text-sm font-bold text-gray-900">Kaspi Bank переводом</div>
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-tight">Казахстан</div>
+                    <div className="text-sm font-bold text-gray-900">{t('kaspi_transfer')}</div>
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-tight">{t('kz_region')}</div>
                   </div>
                 </div>
                 <div className="text-gray-300 group-hover:text-indigo-500">→</div>
@@ -134,8 +136,8 @@ export default function SupportModal({ isOpen, onClose }) {
                 <div className="flex items-center gap-3">
                   <div className="text-2xl">🌍</div>
                   <div className="text-left">
-                    <div className="text-sm font-bold text-gray-900">DonationAlerts</div>
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Весь мир / Карты</div>
+                    <div className="text-sm font-bold text-gray-900">{t('global_pay')}</div>
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('global_region')}</div>
                   </div>
                 </div>
                 <div className="text-gray-300 group-hover:text-orange-500">→</div>
@@ -149,7 +151,7 @@ export default function SupportModal({ isOpen, onClose }) {
             {method === 'kaspi' ? (
               <>
                 <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6 text-left">
-                  <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1 text-center">Kaspi Bank</div>
+                  <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1 text-center">{t('kaspi_bank')}</div>
                   <div className="text-xl font-bold text-gray-900 mb-1 text-center">{kaspiNumber}</div>
                   <div className="text-xs text-gray-500 mb-4 text-center">{holderName}</div>
                   
@@ -159,26 +161,26 @@ export default function SupportModal({ isOpen, onClose }) {
                       copied ? 'bg-green-500 text-white' : 'bg-gray-900 text-white hover:bg-black active:scale-95'
                     }`}
                   >
-                    {copied ? <>✅ Номер скопирован!</> : <>📋 Копировать номер</>}
+                    {copied ? t('btn_copied') : t('btn_copy')}
                   </button>
 
                   <button 
                     onClick={() => setStep(3)}
                     className="w-full py-3 rounded-xl font-bold text-sm bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all shadow-sm"
                   >
-                    Я уже перевел! 🚀
+                    {t('btn_already_paid')}
                   </button>
                 </div>
               </>
             ) : (
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 mb-6">
                 <div className="text-3xl mb-4">🏆</div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Глобальная оплата</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('global_pay_title')}</h3>
                 <p className="text-xs text-gray-500 mb-2 leading-relaxed">
-                  Через DonationAlerts можно оплатить любой картой мира, Apple Pay или криптой.
+                  {t('global_pay_desc')}
                 </p>
                 <p className="text-[10px] text-indigo-400 font-bold mb-6 flex items-center justify-center gap-1">
-                  <span>🇰🇿</span> <span>Тенге (₸) конвертируются автоматически</span>
+                  <span>🇰🇿</span> <span>{t('global_pay_convert')}</span>
                 </p>
                 
                 <a 
@@ -187,33 +189,33 @@ export default function SupportModal({ isOpen, onClose }) {
                   rel="noreferrer"
                   className="block w-full py-4 bg-[#FF7300] text-white rounded-xl font-black text-sm hover:brightness-110 active:scale-95 transition-all mb-4"
                 >
-                  ПЕРЕЙТИ К ОПЛАТЕ 🔥
+                  {t('btn_go_pay')}
                 </a>
 
                 <button 
                   onClick={() => setStep(3)}
                   className="w-full py-3 rounded-xl font-bold text-sm bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition-all"
                 >
-                  Я задонатил! ✅
+                  {t('btn_donated')}
                 </button>
               </div>
             )}
             
             <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest mb-4">
-              ← Выбрать другой способ
+              {t('btn_choose_other')}
             </button>
           </div>
         )}
 
         {step === 3 && (
           <div className="p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Подтверждение</h2>
-            <p className="text-sm text-gray-500 mb-6">Напиши сумму и прикрепи скриншот (если есть), чтобы мы выдали тебе Ауру.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('confirm_title')}</h2>
+            <p className="text-sm text-gray-500 mb-6">{t('confirm_desc')}</p>
             
             <form onSubmit={handleSubmitConfirmation} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Сумма</label>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">{t('label_amount')}</label>
                   <input 
                     type="number" 
                     value={amount}
@@ -223,7 +225,7 @@ export default function SupportModal({ isOpen, onClose }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Скриншот</label>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">{t('label_screenshot')}</label>
                   <input 
                     type="file" 
                     accept="image/*"
@@ -233,13 +235,13 @@ export default function SupportModal({ isOpen, onClose }) {
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Комментарий</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">{t('label_comment')}</label>
                 <input 
                   type="text" 
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none" 
-                  placeholder="Твое имя или пожелание..."
+                  placeholder={t('placeholder_comment')}
                 />
               </div>
 
@@ -249,14 +251,14 @@ export default function SupportModal({ isOpen, onClose }) {
                   onClick={() => setStep(2)}
                   className="flex-1 py-3 rounded-xl font-bold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
                 >
-                  Назад
+                  {t('btn_back')}
                 </button>
                 <button 
                   type="submit"
                   disabled={loading}
                   className="flex-[2] py-3 rounded-xl font-bold text-sm bg-gray-900 text-white hover:bg-black active:scale-95 transition-all disabled:opacity-50"
                 >
-                  {loading ? 'Отправка...' : 'Отправить 💌'}
+                  {loading ? t('btn_sending') : t('btn_send')}
                 </button>
               </div>
             </form>
@@ -269,9 +271,9 @@ export default function SupportModal({ isOpen, onClose }) {
                <div className="absolute inset-0 bg-green-100 scale-110 blur-2xl opacity-40 rounded-full animate-pulse"></div>
                <div className="relative z-10 text-6xl">😻☕</div>
             </div>
-            <h2 className="text-2xl font-brand text-gray-900 mb-2">Ай, спасибо!</h2>
+            <h2 className="text-2xl font-brand text-gray-900 mb-2">{t('success_thanks_title')}</h2>
             <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              Мяу! Твоя поддержка долетела. Как только я подтвержу перевод, в твоем профиле появится **особая Аура**! ✨
+              {t('success_thanks_desc')}
             </p>
             <div className="relative">
               {isExploding && (
@@ -287,14 +289,14 @@ export default function SupportModal({ isOpen, onClose }) {
                 onClick={handleBaBah}
                 className={`w-full py-4 rounded-xl font-bold text-lg bg-indigo-600 text-white shadow-xl hover:scale-105 active:scale-95 transition-all relative overflow-hidden ${isExploding ? 'opacity-0 scale-150 transition-all duration-300' : ''}`}
               >
-                Ба-бах! ❤️
+                {t('btn_babah')}
               </button>
             </div>
           </div>
         )}
 
         <div className="p-4 bg-indigo-50 text-indigo-600 text-center text-[10px] font-bold tracking-widest uppercase">
-          JAS VOLUNTEERS — СДЕЛАНО С ЛЮБОВЬЮ В КАЗАХСТАНЕ 🇰🇿
+          {t('footer_made_in_kz')}
         </div>
       </div>
     </div>

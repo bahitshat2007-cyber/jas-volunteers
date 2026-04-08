@@ -37,7 +37,7 @@ function NewsPage() {
   }
 
   const handleDeleteNews = async (newsId) => {
-    if (!window.confirm('Вы уверены, что хотите удалить эту новость?')) return
+    if (!window.confirm(t('confirm_delete_news'))) return
     
     try {
       const { error } = await supabase
@@ -49,7 +49,7 @@ function NewsPage() {
       setNewsList(prev => prev.filter(n => n.id !== newsId))
     } catch (err) {
       console.error('Error deleting news:', err)
-      alert('Не удалось удалить новость.')
+      alert(t('err_delete_news'))
     }
   }
 
@@ -62,7 +62,7 @@ function NewsPage() {
     fetchNews()
   }, [])
 
-  if (loading) return <LoadingScreen message="Загрузка новостей..." />
+  if (loading) return <LoadingScreen message={t('loading_news')} />
 
   return (
     <div className="max-w-6xl mx-auto pb-20 px-4">
@@ -73,7 +73,7 @@ function NewsPage() {
             {t('nav_news')} <span className="text-[var(--color-primary)]">.</span>
           </h1>
           <p className="text-gray-500 font-medium max-w-lg">
-            Узнавайте первыми о главных событиях, изменениях в командах и жизни Jas Volunteers.
+            {t('news_subtitle')}
           </p>
         </div>
         
@@ -82,7 +82,7 @@ function NewsPage() {
             onClick={() => { setEditingNews(null); setIsCreateModalOpen(true); }}
             className="btn btn-jas rounded-2xl px-8 h-14 font-black uppercase tracking-widest shadow-xl shadow-red-100 hover:scale-105 transition-all text-xs"
           >
-            📢 ОПУБЛИКОВАТЬ НОВОСТЬ
+            {t('btn_publish_news')}
           </button>
         )}
       </div>
@@ -91,8 +91,8 @@ function NewsPage() {
       {newsList.length === 0 ? (
         <div className="text-center py-32 bg-gray-50 rounded-[3rem] border border-dashed border-gray-200">
            <div className="text-6xl mb-6 opacity-20">📭</div>
-           <h3 className="text-xl font-bold text-gray-400">Новостей пока нет</h3>
-           <p className="text-gray-400 text-sm mt-2">Будьте первым, кто расскажет о важном!</p>
+           <h3 className="text-xl font-bold text-gray-400">{t('no_news_title')}</h3>
+           <p className="text-gray-400 text-sm mt-2">{t('no_news_desc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -121,8 +121,8 @@ function NewsPage() {
                       {selectedNews.teams?.logo_url ? <img src={selectedNews.teams.logo_url} className="w-full h-full object-cover rounded" /> : '📢'}
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 leading-none mb-1">Новости</span>
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter truncate max-w-[200px]">{selectedNews.teams?.name || 'Организация'}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 leading-none mb-1">{t('nav_news')}</span>
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter truncate max-w-[200px]">{selectedNews.teams?.name || t('org_fallback')}</span>
                    </div>
                 </div>
                 <button 
@@ -157,7 +157,7 @@ function NewsPage() {
                   </div>
                   
                   <div className="mt-12 pt-8 border-t border-dashed border-gray-100 text-center">
-                     <p className="text-xs text-gray-300 font-bold uppercase tracking-widest mb-4">Конец публикации</p>
+                     <p className="text-xs text-gray-300 font-bold uppercase tracking-widest mb-4">{t('end_of_publication')}</p>
                      <div className="flex justify-center gap-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500/20"></div>
                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500/40"></div>
@@ -173,7 +173,7 @@ function NewsPage() {
                   onClick={() => setSelectedNews(null)} 
                   className="btn btn-jas bg-gray-900 hover:bg-black text-white rounded-2xl px-12 py-3 font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all"
                 >
-                  Закрыть
+                  {t('btn_close')}
                 </button>
              </div>
           </div>

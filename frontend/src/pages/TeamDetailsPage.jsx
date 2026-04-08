@@ -2,29 +2,25 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import LoadingScreen from '../components/LoadingScreen.jsx'
-
-const getRankName = (hours) => {
-  const rs = [
-    { name: 'Новичок',    min: 0 },
-    { name: 'Доброволец', min: 50 },
-    { name: 'Активист',   min: 200 },
-    { name: 'Ветеран',    min: 500 },
-    { name: 'Чемпион',    min: 1000 },
-    { name: 'Легенда',    min: 2500 }
-  ];
-  let idx = 0;
-  for (let i = rs.length - 1; i >= 0; i--) {
-    if (hours >= rs[i].min) { idx = i; break; }
-  }
-  return rs[idx].name;
-}
 
 function TeamDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user, refreshProfile } = useAuth()
   
+  const { t } = useLanguage()
+
+  const getRankName = (hours) => {
+    if (hours >= 2500) return t('rank_legend')
+    if (hours >= 1000) return t('rank_champion')
+    if (hours >= 500) return t('rank_veteran')
+    if (hours >= 200) return t('rank_activist')
+    if (hours >= 50) return t('rank_volunteer')
+    return t('rank_novice')
+  }
+
   const [team, setTeam] = useState(null)
   const [members, setMembers] = useState([])
   const [announcements, setAnnouncements] = useState([])
@@ -85,9 +81,9 @@ function TeamDetailsPage() {
       if (annQueryError) {
          console.error('Announcements Error:', annQueryError)
          if (annQueryError.code === '42P01') {
-            setAnnError('Таблица объявлений не найдена. Создайте её в Supabase!')
+            setAnnError(t('err_announcements_table'))
          } else {
-            setAnnError('Не удалось загрузить новости')
+            setAnnError(t('err_announcements_load'))
          }
       } else {
          setAnnouncements(annData || [])
@@ -96,9 +92,11 @@ function TeamDetailsPage() {
 
       setTeam(teamData)
       setMembers(membersData || [])
+      setTeam(teamData)
+      setMembers(membersData || [])
     } catch (err) {
       console.error(err)
-      setError('Ошибка загрузки данных команды')
+      setError(t('err_team_load'))
     } finally {
       setLoading(false)
     }
@@ -135,14 +133,14 @@ function TeamDetailsPage() {
       setAnnouncements([data[0], ...announcements.slice(0, 14)])
       setNewAnnouncement('')
     } catch (err) {
-      alert('Ошибка при публикации. Убедитесь, что таблица team_announcements создана!')
+      alert(t('err_publish'))
     } finally {
       setIsPosting(false)
     }
   }
 
   const handleDeleteAnnouncement = async (annId) => {
-    if (!window.confirm('Удалить сообщение?')) return
+    if (!window.confirm(t('confirm_delete_msg'))) return
     try {
       await supabase.from('team_announcements').delete().eq('id', annId)
       setAnnouncements(announcements.filter(a => a.id !== annId))
@@ -155,7 +153,7 @@ function TeamDetailsPage() {
     setIsProcessing(true)
     try {
       if (action === 'kick') {
-        if (!confirm('Выгнать участника?')) return
+        if (!confirm(t('confirm_kick'))) return
         const { error } = await supabase.rpc('kick_team_member', { target_user_id: targetId })
         if (error) throw error
       } else if (action === 'promote') {
@@ -169,7 +167,7 @@ function TeamDetailsPage() {
       await fetchData()
       setShowManageMenu(null)
     } catch (err) {
-      alert('Ошибка: ' + err.message)
+      alert(t('err_default') + err.message)
     } finally {
       setIsProcessing(false)
     }
@@ -204,14 +202,14 @@ function TeamDetailsPage() {
       setAwardHoursAmount('')
       setAwardHoursReason('')
     } catch (err) {
-      alert('Ошибка при начислении часов: ' + err.message)
+      alert(t('err_award') + err.message)
     } finally {
       setIsProcessing(false)
     }
   }
 
   const startLeaveTeam = async () => {
-    if (!confirm('Вы уверены, что хотите покинуть команду? Все ваши заслуги сохранятся, но вы больше не будете частью этого клана.')) return
+    if (!confirm(t('confirm_leave_team'))) return
     setIsProcessing(true)
     try {
       const { error } = await supabase.rpc('leave_team')
@@ -220,7 +218,7 @@ function TeamDetailsPage() {
       await refreshProfile()
       navigate('/teams')
     } catch (err) {
-      alert('Ошибка: ' + err.message)
+      alert(t('err_default') + err.message)
     } finally {
       setIsProcessing(false)
     }
@@ -231,8 +229,8 @@ function TeamDetailsPage() {
     setCountdown(5)
     setShowManageMenu(null)
   }
-  if (loading) return <LoadingScreen message="Сбор данных клана..." />;
-  if (error || !team) return <div className="text-center py-20"><h2 className="text-red-500 font-bold">{error || 'Команда не найдена'}</h2></div>
+  if (loading) return <LoadingScreen message={t('loading_team')} />;
+  if (error || !team) return <div className="text-center py-20"><h2 className="text-red-500 font-bold">{error || t('team_not_found')}</h2></div>
 
   const primaryColor = team.color_primary || '#1B4332'
   
@@ -248,7 +246,7 @@ function TeamDetailsPage() {
           {isMyTeam && (
             <div className="flex flex-col items-center gap-4 mb-8">
               <div className="bg-white text-indigo-600 px-6 py-2 rounded-2xl font-black uppercase tracking-widest shadow-2xl flex items-center gap-2 animate-bounce-subtle border-b-4 border-indigo-200">
-                 <span className="text-xl">⭐️</span> ТВОЙ КЛАН <span className="text-xl">⭐️</span>
+                 <span className="text-xl">⭐️</span> {t('your_clan')} <span className="text-xl">⭐️</span>
               </div>
               
               {!amICoordinator && (
@@ -257,7 +255,7 @@ function TeamDetailsPage() {
                   disabled={isProcessing}
                   className="bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md text-white border border-white/30 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                 >
-                  {isProcessing ? 'УХОДИМ...' : '🚪 Покинуть команду'}
+                  {isProcessing ? t('leaving_progress') : t('leave_team')}
                 </button>
               )}
             </div>
@@ -272,12 +270,12 @@ function TeamDetailsPage() {
           <div className="flex gap-8 bg-black/30 px-10 py-5 rounded-[2rem] border border-white/20 backdrop-blur-lg shadow-xl">
             <div className="text-center">
               <div className="text-4xl font-black leading-tight">{members.reduce((a, m) => a + (m.total_hours || 0), 0)}</div>
-              <div className="text-[10px] uppercase font-black tracking-widest opacity-60">Всего часов</div>
+              <div className="text-[10px] uppercase font-black tracking-widest opacity-60">{t('stat_total_hours')}</div>
             </div>
             <div className="w-px bg-white/20"></div>
             <div className="text-center">
               <div className="text-4xl font-black leading-tight">{members.length}</div>
-              <div className="text-[10px] uppercase font-black tracking-widest opacity-60">Бойцов</div>
+              <div className="text-[10px] uppercase font-black tracking-widest opacity-60">{t('stat_fighters')}</div>
             </div>
           </div>
         </div>
@@ -290,7 +288,7 @@ function TeamDetailsPage() {
           <div className="bg-white rounded-[2rem] card-shadow">
             <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30 rounded-t-[2rem]">
               <h2 className="text-2xl font-brand flex items-center gap-3">
-                <span className="bg-indigo-100 p-2 rounded-xl">👥</span> Участники клана
+                <span className="bg-indigo-100 p-2 rounded-xl">👥</span> {t('clan_members')}
               </h2>
               <div className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">Hall of Fame</div>
             </div>
@@ -322,14 +320,14 @@ function TeamDetailsPage() {
                     {/* Member Info */}
                     <div className="ml-5 flex-1 min-w-0">
                       <Link to={`/profile/${member.id}`} className="font-black text-gray-800 hover:text-indigo-600 transition-colors block truncate text-sm">
-                        {member.first_name} {member.last_name} {isMe && <span className="text-[10px] text-indigo-400 font-bold ml-1 uppercase">(Ты)</span>}
+                        {member.first_name} {member.last_name} {isMe && <span className="text-[10px] text-indigo-400 font-bold ml-1 uppercase">{t('you')}</span>}
                       </Link>
                       
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                         {/* DISTINCT ROLE BADGES */}
-                        {isAdmin && <span className="bg-red-50 text-red-600 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tight border border-red-100">🛡️ Координатор</span>}
-                        {isSub && <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tight border border-indigo-100">⚖️ Заместитель</span>}
-                        {!isAdmin && !isSub && <span className="bg-gray-50 text-gray-500 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tight border border-gray-100">🙋 Волонтер</span>}
+                        {isAdmin && <span className="bg-red-50 text-red-600 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tight border border-red-100">{t('role_coord_badge')}</span>}
+                        {isSub && <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tight border border-indigo-100">{t('role_sub_badge')}</span>}
+                        {!isAdmin && !isSub && <span className="bg-gray-50 text-gray-500 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tight border border-gray-100">{t('role_vol_badge')}</span>}
                         
                         <span className="text-gray-400 text-[10px] font-medium">• {getRankName(member.total_hours || 0)}</span>
                       </div>
@@ -339,7 +337,7 @@ function TeamDetailsPage() {
                     <div className="flex items-center gap-6">
                       <div className="text-right">
                         <div className="text-xl font-brand text-indigo-950 leading-none">{member.total_hours || 0}</div>
-                        <div className="text-[9px] uppercase font-black text-gray-400 tracking-widest">часов</div>
+                        <div className="text-[9px] uppercase font-black text-gray-400 tracking-widest">{t('hours_unit')}</div>
                       </div>
 
                       {/* ACTIONS MENU */}
@@ -360,14 +358,14 @@ function TeamDetailsPage() {
                               {(amICoordinator || (amISub && !isSub && !isAdmin)) && (
                                 <>
                                   <button onClick={() => { setAwardHoursTarget(member); setShowManageMenu(null); }} className="w-full text-left px-4 py-3 text-xs text-amber-600 hover:bg-amber-50 rounded-xl flex items-center gap-3 font-bold transition-colors">
-                                    ⏱ Начислить часы
+                                    {t('action_award_hours')}
                                   </button>
                                   <div className="h-px bg-gray-50 my-2" />
                                 </>
                               )}
 
                               <button onClick={() => handleAction('kick', member.id)} className="w-full text-left px-4 py-3 text-xs text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2 font-black uppercase tracking-tighter transition-colors">
-                                🚫 Исключить из клана
+                                {t('action_kick')}
                               </button>
                               
                               {amICoordinator && (
@@ -375,16 +373,16 @@ function TeamDetailsPage() {
                                   <div className="h-px bg-gray-50 my-2" />
                                   {isSub ? (
                                     <button onClick={() => handleAction('promote', member.id, 'volunteer')} className="w-full text-left px-4 py-3 text-xs hover:bg-gray-50 rounded-xl flex items-center gap-3 font-bold transition-colors">
-                                      📉 Разжаловать в рядовые
+                                      {t('action_demote')}
                                     </button>
                                   ) : (
                                     <button onClick={() => handleAction('promote', member.id, 'sub_coordinator')} className="w-full text-left px-4 py-3 text-xs hover:bg-gray-50 rounded-xl flex items-center gap-3 font-bold transition-colors">
-                                      📈 Назначить заместителем
+                                      {t('action_promote')}
                                     </button>
                                   )}
                                   {!isAdmin && (
                                     <button onClick={() => startTransfer(member)} className="w-full text-left px-4 py-3 text-xs text-indigo-600 hover:bg-indigo-50 rounded-xl flex items-center gap-3 font-black uppercase tracking-tighter transition-all">
-                                      👑 Передать корону
+                                      {t('action_transfer')}
                                     </button>
                                   )}
                                 </>
@@ -409,12 +407,12 @@ function TeamDetailsPage() {
             <div className="bg-gradient-to-br from-indigo-700 to-indigo-600 rounded-[2rem] p-8 shadow-2xl shadow-indigo-100 text-white relative overflow-hidden group">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
               <h3 className="font-black text-xs uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
-                <span className="bg-white/20 p-1.5 rounded-lg shadow-inner">✍️</span> НОВОЕ ОБЪЯВЛЕНИЕ
+                <span className="bg-white/20 p-1.5 rounded-lg shadow-inner">✍️</span> {t('new_announcement_title')}
               </h3>
               <form onSubmit={handlePostAnnouncement}>
                 <textarea 
                   className="w-full bg-white/10 border-white/20 rounded-2xl p-4 text-sm placeholder:text-white/40 focus:ring-4 focus:ring-white/20 border text-white min-h-[120px] transition-all resize-none"
-                  placeholder="О чем должен знать твой клан?"
+                  placeholder={t('new_announcement_placeholder')}
                   value={newAnnouncement}
                   onChange={(e) => setNewAnnouncement(e.target.value)}
                 />
@@ -422,7 +420,7 @@ function TeamDetailsPage() {
                   disabled={isPosting || !newAnnouncement.trim()}
                   className="w-full bg-white text-indigo-700 font-black py-4 rounded-xl mt-4 hover:bg-indigo-50 transition-all shadow-xl active:scale-95 disabled:opacity-50 uppercase tracking-widest text-[11px]"
                 >
-                  {isPosting ? 'ПУБЛИКАЦИЯ...' : 'ОПУБЛИКОВАТЬ ⚡️'}
+                  {isPosting ? t('btn_publishing') : t('btn_publish')}
                 </button>
               </form>
             </div>
@@ -431,7 +429,7 @@ function TeamDetailsPage() {
           {/* COMPACT NEWS FEED */}
           <div className="bg-white rounded-[2rem] card-shadow overflow-hidden flex flex-col h-[550px] border border-gray-50">
             <div className="p-6 border-b flex justify-between items-center bg-gray-50/50">
-              <h2 className="text-xl font-brand flex items-center gap-2">📢 Новости</h2>
+              <h2 className="text-xl font-brand flex items-center gap-2">{t('news_title')}</h2>
               <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">History</span>
             </div>
             
@@ -439,13 +437,13 @@ function TeamDetailsPage() {
               {annError ? (
                  <div className="text-center py-20 px-6">
                     <div className="text-3xl mb-4">⚠️</div>
-                    <p className="text-xs text-red-400 font-black uppercase leading-tight mb-2">Ошибка подключения</p>
+                    <p className="text-xs text-red-400 font-black uppercase leading-tight mb-2">{t('err_connection')}</p>
                     <p className="text-[10px] text-gray-400 leading-relaxed italic">{annError}</p>
                  </div>
               ) : announcements.length === 0 ? (
                 <div className="text-center py-24 text-gray-300">
                   <div className="text-3xl mb-4 opacity-30">📭</div>
-                  <p className="text-xs italic">Новостей пока нет...</p>
+                  <p className="text-xs italic">{t('no_news')}</p>
                 </div>
               ) : (
                 announcements.map((ann) => (
@@ -475,9 +473,9 @@ function TeamDetailsPage() {
 
           {/* ABOUT CARD */}
           <div className="bg-indigo-50/50 rounded-[2rem] p-8 border border-indigo-100/50">
-            <h3 className="font-black text-[10px] uppercase tracking-[0.25em] text-indigo-300 mb-4">Манифест клана</h3>
+            <h3 className="font-black text-[10px] uppercase tracking-[0.25em] text-indigo-300 mb-4">{t('clan_manifesto')}</h3>
             <p className="text-xs text-gray-500 leading-relaxed italic">
-              {team.description || "У этого клана пока нет официального манифеста."}
+              {team.description || t('no_manifesto')}
             </p>
           </div>
 
@@ -489,11 +487,11 @@ function TeamDetailsPage() {
          <div className="fixed inset-0 bg-indigo-950/40 backdrop-blur-md z-[100] flex items-center justify-center p-4">
             <div className="bg-white rounded-[3rem] p-12 max-w-sm w-full text-center shadow-[0_32px_128px_-16px_rgba(0,0,0,0.3)] animate-in slide-in-from-bottom-8 duration-500">
                <div className="text-6xl mb-8 filter drop-shadow-lg">👑</div>
-               <h3 className="text-3xl font-brand mb-4 text-gray-900">Корона падет...</h3>
+               <h3 className="text-3xl font-brand mb-4 text-gray-900">{t('transfer_title')}</h3>
                <p className="text-sm text-gray-500 mb-10 leading-relaxed px-2">
-                  Ты передаешь власть над кланом воину <span className="font-black text-indigo-600">{transferTarget.first_name}</span>.<br /><br />
+                  {t('transfer_desc1')} <span className="font-black text-indigo-600">{transferTarget.first_name}</span>.<br /><br />
                   <span className="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest inline-block border border-red-100">
-                    Твоя роль изменится на Заместителя
+                    {t('transfer_desc2')}
                   </span>
                </p>
                
@@ -503,10 +501,10 @@ function TeamDetailsPage() {
                     onClick={() => handleAction('transfer', transferTarget.id)}
                     className="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-2xl shadow-indigo-200 active:scale-95 disabled:opacity-50 transition-all text-xs uppercase tracking-[0.2em]"
                   >
-                    {countdown > 0 ? `ПОДТВЕРЖДАЮ (${countdown}с)` : 'ДА БУДЕТ ТАК'}
+                    {countdown > 0 ? t('btn_confirm_transfer_wait').replace('{seconds}', countdown) : t('btn_confirm_transfer')}
                   </button>
                   <button onClick={() => setTransferTarget(null)} className="w-full py-4 text-[10px] text-gray-400 font-black uppercase tracking-widest hover:text-gray-600 transition-colors">
-                    Я передумал
+                    {t('btn_change_mind')}
                   </button>
                </div>
             </div>
@@ -518,22 +516,22 @@ function TeamDetailsPage() {
          <div className="fixed inset-0 bg-indigo-950/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                <div className="flex justify-between items-start mb-2">
-                 <h3 className="text-xl font-bold flex items-center gap-2"><span>⏱</span> Начисление часов</h3>
+                 <h3 className="text-xl font-bold flex items-center gap-2"><span>⏱</span> {t('award_title')}</h3>
                  <button onClick={() => setAwardHoursTarget(null)} className="text-gray-400 hover:text-gray-600">✕</button>
                </div>
-               <p className="text-sm text-gray-500 mb-6">Волонтёр: <span className="font-bold text-indigo-600">{awardHoursTarget.first_name} {awardHoursTarget.last_name}</span></p>
+               <p className="text-sm text-gray-500 mb-6">{t('volunteer')} <span className="font-bold text-indigo-600">{awardHoursTarget.first_name} {awardHoursTarget.last_name}</span></p>
                
                <form onSubmit={handleAwardHours} className="space-y-4">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Количество часов</label>
-                    <input type="number" step="0.5" min="0.5" max="10000" required value={awardHoursAmount} onChange={e => setAwardHoursAmount(e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-bold" placeholder="Например: 4.5" />
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">{t('amount_hours')}</label>
+                    <input type="number" step="0.5" min="0.5" max="10000" required value={awardHoursAmount} onChange={e => setAwardHoursAmount(e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-bold" placeholder={t('amount_placeholder')} />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Причина / Мероприятие</label>
-                    <textarea required value={awardHoursReason} onChange={e => setAwardHoursReason(e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none h-24 text-sm" placeholder="Уборка парка 24 марта..." />
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">{t('award_reason')}</label>
+                    <textarea required value={awardHoursReason} onChange={e => setAwardHoursReason(e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none h-24 text-sm" placeholder={t('award_reason_placeholder')} />
                   </div>
                   <button type="submit" disabled={isProcessing} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 text-[11px] font-black uppercase tracking-widest rounded-xl shadow-xl shadow-indigo-200 transition-all disabled:opacity-50 mt-2">
-                    {isProcessing ? 'СОХРАНЕНИЕ...' : 'ПОДТВЕРДИТЬ НАЧИСЛЕНИЕ'}
+                    {isProcessing ? t('btn_saving') : t('btn_confirm_award')}
                   </button>
                </form>
             </div>

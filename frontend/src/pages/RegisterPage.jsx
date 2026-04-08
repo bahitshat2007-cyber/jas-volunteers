@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabase.js'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 function RegisterPage() {
   const { signUp } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const [firstName, setFirstName] = useState('')
@@ -66,17 +68,17 @@ function RegisterPage() {
 
     // Validate
     if (!firstName.trim() || !lastName.trim() || !firstNameEn.trim() || !lastNameEn.trim()) {
-      setError('Заполните все поля имен (кириллица и латинница)')
+      setError(t('err_fill_all_names'))
       setLoading(false)
       return
     }
     if (password.length < 8) {
-      setError('Пароль должен быть минимум 8 символов')
+      setError(t('err_pass_length'))
       setLoading(false)
       return
     }
     if (!/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(password)) {
-      setError('Пароль должен содержать только латинские буквы, цифры и спецсимволы (без кириллицы)')
+      setError(t('err_pass_chars'))
       setLoading(false)
       return
     }
@@ -86,19 +88,19 @@ function RegisterPage() {
     const latinRegex = /^[A-Za-z\s-]+$/;
 
     if (!cyrillicRegex.test(firstName.trim()) || !cyrillicRegex.test(lastName.trim())) {
-      setError('Имя и Фамилия должны быть написаны кириллицей (русские/казахские буквы)')
+      setError(t('err_names_cyrillic'))
       setLoading(false)
       return
     }
 
     if (firstNameEn.trim() || lastNameEn.trim()) {
       if (!firstNameEn.trim() || !lastNameEn.trim()) {
-        setError('Если заполняете английское имя, укажите и имя, и фамилию')
+        setError(t('err_names_latin_both'))
         setLoading(false)
         return
       }
       if (!latinRegex.test(firstNameEn.trim()) || !latinRegex.test(lastNameEn.trim())) {
-        setError('Английское имя и фамилия должны быть написаны только латинскими буквами')
+        setError(t('err_names_latin_only'))
         setLoading(false)
         return
       }
@@ -110,7 +112,7 @@ function RegisterPage() {
     // If coordinator wants to create a new team
     if (role === 'coordinator' && teamAction === 'create') {
       if (!newTeamName.trim()) {
-        setError('Укажите название команды')
+        setError(t('err_req_team_name'))
         setLoading(false)
         return
       }
@@ -120,7 +122,7 @@ function RegisterPage() {
 
     // If volunteer, must select a team
     if (role === 'volunteer' && !selectedTeam) {
-      setError('Выберите команду')
+      setError(t('err_req_team_select'))
       setLoading(false)
       return
     }
@@ -152,7 +154,7 @@ function RegisterPage() {
       })
     }
 
-    setSuccess('✅ Регистрация успешна! Проверьте почту для подтверждения.')
+    setSuccess(t('success_register'))
     setLoading(false)
   }
 
@@ -162,7 +164,7 @@ function RegisterPage() {
         {/* Logo */}
         <div className="text-center mb-6">
           <img src="/logo.png" alt="Jas Volunteers" className="h-14 w-14 mx-auto mb-2 object-contain" />
-          <h1 className="font-brand text-2xl text-[var(--color-text-heading)] uppercase">Регистрация</h1>
+          <h1 className="font-brand text-2xl text-[var(--color-text-heading)] uppercase">{t('register_title')}</h1>
         </div>
 
         {error && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">⚠️ {error}</div>}
@@ -171,46 +173,46 @@ function RegisterPage() {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium mb-1 block">Имя (кириллица)</label>
+              <label className="text-sm font-medium mb-1 block">{t('label_fn_cyrillic')}</label>
               <input type="text" placeholder="Айдар" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="input input-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200" required />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Фамилия (кириллица)</label>
+              <label className="text-sm font-medium mb-1 block">{t('label_ln_cyrillic')}</label>
               <input type="text" placeholder="Касымов" value={lastName} onChange={(e) => setLastName(e.target.value)} className="input input-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200" required />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium mb-1 block text-indigo-600 font-bold">First Name (Latin)</label>
+              <label className="text-sm font-medium mb-1 block text-indigo-600 font-bold">{t('label_fn_latin')}</label>
               <input type="text" placeholder="Aidar" value={firstNameEn} onChange={handleLatinChange(setFirstNameEn)} className="input input-bordered w-full rounded-xl bg-indigo-50 border-indigo-200" required />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block text-indigo-600 font-bold">Last Name (Latin)</label>
+              <label className="text-sm font-medium mb-1 block text-indigo-600 font-bold">{t('label_ln_latin')}</label>
               <input type="text" placeholder="Kasymov" value={lastNameEn} onChange={handleLatinChange(setLastNameEn)} className="input input-bordered w-full rounded-xl bg-indigo-50 border-indigo-200" required />
             </div>
             {latinError && (
               <div className="col-span-2 text-[10px] text-red-500 font-bold animate-pulse">
-                ⚠️ Пишите только латинскими буквами (English/Latin only)
+                {t('latin_warning')}
               </div>
             )}
           </div>
 
           <p className="text-[10px] text-indigo-400 font-medium mb-3 -mt-1 italic">
-            * Латинские имена нужны для автоматического формирования вашего англоязычного портфолио для вузов
+            {t('latin_note')}
           </p>
 
           <div>
-            <label className="text-sm font-medium mb-1 block">Email</label>
+            <label className="text-sm font-medium mb-1 block">{t('label_email')}</label>
             <input type="email" placeholder="volunteer@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="input input-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200" required />
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-1 block">Пароль</label>
+            <label className="text-sm font-medium mb-1 block">{t('label_password')}</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Минимум 8 символов"
+                placeholder={t('placeholder_min_8')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input input-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200 pr-12"
@@ -225,15 +227,15 @@ function RegisterPage() {
 
           {/* Role Selection */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Я регистрируюсь как:</label>
+            <label className="text-sm font-medium mb-2 block">{t('label_register_as')}</label>
             <div className="flex gap-2">
               <button type="button" onClick={() => setRole('volunteer')}
                 className={`flex-1 py-3 rounded-xl font-medium transition-colors text-xs ${role === 'volunteer' ? 'bg-[var(--color-primary)] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
-                🙋 Волонтер
+                {t('btn_role_vol')}
               </button>
               <button type="button" onClick={() => setRole('coordinator')}
                 className={`flex-1 py-3 rounded-xl font-medium transition-colors text-xs ${role === 'coordinator' ? 'bg-[var(--color-primary)] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
-                🛡️ Координатор
+                {t('btn_role_coord')}
               </button>
             </div>
           </div>
@@ -241,9 +243,9 @@ function RegisterPage() {
           {/* Team Selection (Volunteer) */}
           {role === 'volunteer' && (
             <div>
-              <label className="text-sm font-medium mb-1 block">Выберите команду</label>
+              <label className="text-sm font-medium mb-1 block">{t('label_select_team')}</label>
               <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} className="select select-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200" required>
-                <option value="">— Выберите команду —</option>
+                <option value="">{t('option_select_team')}</option>
                 {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
@@ -255,45 +257,45 @@ function RegisterPage() {
               <div className="flex gap-2">
                 <button type="button" onClick={() => setTeamAction('join')}
                   className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${teamAction === 'join' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                  Присоединиться
+                  {t('btn_action_join')}
                 </button>
                 <button type="button" onClick={() => setTeamAction('create')}
                   className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${teamAction === 'create' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                  ➕ Создать новую
+                  {t('btn_action_create')}
                 </button>
               </div>
 
               {teamAction === 'join' && (
                 <div className="space-y-3">
                   <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} className="select select-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200" required>
-                    <option value="">— Команда —</option>
+                    <option value="">{t('option_team')}</option>
                     {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
                   </select>
                   <select value={adminPosition} onChange={(e) => setAdminPosition(e.target.value)} className="select select-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200">
-                    <option value="coordinator">Координатор</option>
-                    <option value="sub_coordinator">Зам. координатора</option>
+                    <option value="coordinator">{t('option_coord')}</option>
+                    <option value="sub_coordinator">{t('option_sub_coord')}</option>
                   </select>
                 </div>
               )}
 
               {teamAction === 'create' && (
                 <div className="space-y-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">📋 Новая команда</p>
-                  <input type="text" placeholder="Название команды" value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)} className="input input-bordered w-full rounded-xl bg-white border-gray-200 text-sm" required />
-                  <textarea placeholder="Описание проекта..." value={newTeamDesc} onChange={(e) => setNewTeamDesc(e.target.value)} className="textarea textarea-bordered w-full rounded-xl bg-white border-gray-200 text-sm resize-none" rows="2" />
-                  <input type="text" placeholder="Instagram (@team)" value={newTeamInsta} onChange={(e) => setNewTeamInsta(e.target.value)} className="input input-bordered w-full rounded-xl bg-white border-gray-200 text-sm" />
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('label_new_team')}</p>
+                  <input type="text" placeholder={t('placeholder_team_name')} value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)} className="input input-bordered w-full rounded-xl bg-white border-gray-200 text-sm" required />
+                  <textarea placeholder={t('placeholder_team_desc')} value={newTeamDesc} onChange={(e) => setNewTeamDesc(e.target.value)} className="textarea textarea-bordered w-full rounded-xl bg-white border-gray-200 text-sm resize-none" rows="2" />
+                  <input type="text" placeholder={t('placeholder_team_insta')} value={newTeamInsta} onChange={(e) => setNewTeamInsta(e.target.value)} className="input input-bordered w-full rounded-xl bg-white border-gray-200 text-sm" />
                 </div>
               )}
             </div>
           )}
 
           <button type="submit" className="btn btn-jas w-full rounded-xl text-base mt-2" disabled={loading}>
-            {loading ? <span className="loading loading-spinner loading-sm"></span> : 'Присоединиться к Jas Volunteers 🚀'}
+            {loading ? <span className="loading loading-spinner loading-sm"></span> : t('btn_join_jas')}
           </button>
         </form>
 
         <p className="text-center text-sm text-[var(--color-text-body)] mt-4">
-          Уже есть аккаунт? <NavLink to="/login" className="text-[var(--color-primary)] font-medium underline">Войти</NavLink>
+          {t('already_have_account')} <NavLink to="/login" className="text-[var(--color-primary)] font-medium underline">{t('btn_login_link')}</NavLink>
         </p>
       </div>
     </div>

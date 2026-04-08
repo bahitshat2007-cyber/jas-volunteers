@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import { supabase } from '../lib/supabase.js'
 import { QRCodeSVG } from 'qrcode.react'
 import LoadingScreen from '../components/LoadingScreen.jsx'
@@ -43,6 +44,7 @@ const getRankData = (hours) => {
 function ProfilePage() {
   const { id } = useParams()
   const { user: currentUser, profile: currentProfile, loading: authLoading, signOut, refreshProfile } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   
   const [profile, setProfile] = useState(null)
@@ -178,10 +180,10 @@ function ProfilePage() {
   }, [profile?.total_hours, isOwnProfile, currentUser?.id])
 
   const roleLabels = {
-    volunteer: '🙋 Волонтер',
-    sub_coordinator: '🎗️ Зам. координатора',
-    coordinator: '🛠️ Координатор',
-    developer: '🛠️ Разработчик',
+    volunteer: t('role_volunteer'),
+    sub_coordinator: t('role_sub_coordinator'),
+    coordinator: t('role_coordinator'),
+    developer: t('role_developer'),
   }
 
   async function handleAvatarUpload(e) {
@@ -215,7 +217,7 @@ function ProfilePage() {
       // Refresh current view too
       setProfile({...profile, avatar_url: publicUrl})
     } catch (error) {
-      alert('Ошибка при загрузке аватара: ' + error.message)
+      alert(t('err_avatar') + error.message)
     } finally {
       setUploading(false)
     }
@@ -235,7 +237,7 @@ function ProfilePage() {
       setProfile({...profile, bio: editBio})
       setIsEditModalOpen(false)
     } catch (error) {
-      alert('Ошибка при обновлении профиля: ' + error.message)
+      alert(t('err_profile_update') + error.message)
     } finally {
       setSaving(false)
     }
@@ -246,22 +248,22 @@ function ProfilePage() {
   }
 
   if (authLoading || loading) {
-    return <LoadingScreen message="Сбор профиля..." />
+    return <LoadingScreen message={t('loading_profile')} />
   }
 
   if (!currentUser && isOwnProfile) {
     return (
       <div className="bg-white rounded-2xl card-shadow p-10 text-center">
         <div className="text-5xl mb-4">🔐</div>
-        <h2 className="text-xl font-bold text-[var(--color-text-heading)] mb-2">Войдите в аккаунт</h2>
-        <p className="text-[var(--color-text-body)] mb-6">Чтобы увидеть свой профиль, войдите или зарегистрируйтесь</p>
-        <button onClick={() => navigate('/login')} className="btn btn-jas rounded-xl">Войти</button>
+        <h2 className="text-xl font-bold text-[var(--color-text-heading)] mb-2">{t('auth_req_title')}</h2>
+        <p className="text-[var(--color-text-body)] mb-6">{t('auth_req_desc')}</p>
+        <button onClick={() => navigate('/login')} className="btn btn-jas rounded-xl">{t('auth_req_btn')}</button>
       </div>
     )
   }
 
   if (!profile) {
-     return <div className="text-center py-20">Пользователь не найден</div>
+     return <div className="text-center py-20">{t('user_not_found')}</div>
   }
 
   const hours = Number(profile?.total_hours || 0)
@@ -299,7 +301,7 @@ function ProfilePage() {
                 </span>
               )}
             </h1>
-            <p className="text-[var(--color-text-body)] text-sm mb-1">{isOwnProfile ? currentUser?.email : 'Аккаунт Jas Volunteers'}</p>
+            <p className="text-[var(--color-text-body)] text-sm mb-1">{isOwnProfile ? currentUser?.email : t('jas_account')}</p>
             {profile?.bio && (
               <p className="text-sm text-[var(--color-text-body)] italic mb-2 line-clamp-2 max-w-md mx-auto sm:mx-0">
                 "{profile.bio}"
@@ -309,13 +311,13 @@ function ProfilePage() {
               <button 
                 onClick={() => navigate('/ranks')}
                 className="badge bg-[var(--color-surface-2)] text-[var(--color-text-heading)] border-0 rounded-lg font-medium hover:bg-indigo-100 transition-colors cursor-help"
-                title="О ролях и полномочиях"
+                title={t('about_roles')}
               >
-                {roleLabels[profile?.role] || '🙋 Волонтер'}
+                {roleLabels[profile?.role] || t('role_volunteer')}
               </button>
               {profile?.is_supporter && (
                 <span className="badge bg-yellow-100 text-yellow-700 border-yellow-200 border rounded-lg font-bold text-[10px] animate-pulse">
-                  ✨ МЕЦЕНАТ
+                  {t('patron')}
                 </span>
               )}
               {profile?.teams && (
@@ -329,7 +331,7 @@ function ProfilePage() {
               <button 
                 onClick={() => navigate('/ranks')}
                 className="badge bg-[var(--color-surface-2)] text-[var(--color-text-body)] border-0 rounded-lg flex items-center pr-3 hover:bg-amber-100 transition-colors cursor-help"
-                title="О системе рангов"
+                title={t('about_ranks')}
               >
                 {getRankData(hours).icon} {getRankData(hours).name}
               </button>
@@ -343,19 +345,19 @@ function ProfilePage() {
                   onClick={() => setIsQRModalOpen(true)}
                   className="btn btn-sm btn-outline border-gray-200 rounded-xl text-[var(--color-text-body)]"
                 >
-                  📷 QR-код
+                  {t('btn_qr')}
                 </button>
                 <button 
                   onClick={generatePDF}
                   className="btn btn-sm bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white border-none rounded-xl shadow-lg shadow-indigo-100"
                 >
-                  📄 PDF Портфолио
+                  {t('btn_pdf')}
                 </button>
                 <button 
                   onClick={() => setIsEditModalOpen(true)}
                   className="btn btn-sm btn-outline border-gray-200 rounded-xl text-[var(--color-text-body)]"
                 >
-                  ✏️ Ред.
+                  {t('btn_edit_profile')}
                 </button>
               </>
             ) : (
@@ -363,7 +365,7 @@ function ProfilePage() {
                 onClick={() => navigate(-1)}
                 className="btn btn-sm btn-ghost rounded-xl"
               >
-                ← Назад
+                {t('btn_back')}
               </button>
             )}
           </div>
@@ -374,15 +376,15 @@ function ProfilePage() {
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white rounded-2xl card-shadow p-4 text-center">
           <div className="text-2xl font-bold text-[var(--color-primary)]">{animatedHours}</div>
-          <div className="text-xs text-[var(--color-text-body)] mt-1">Часов</div>
+          <div className="text-xs text-[var(--color-text-body)] mt-1">{t('stat_hours')}</div>
         </div>
         <div className="bg-white rounded-2xl card-shadow p-4 text-center">
           <div className="text-2xl font-bold text-[var(--color-primary)]">{events}</div>
-          <div className="text-xs text-[var(--color-text-body)] mt-1">Мероприятий</div>
+          <div className="text-xs text-[var(--color-text-body)] mt-1">{t('stat_events_prof')}</div>
         </div>
         <div className="bg-white rounded-2xl card-shadow p-4 text-center">
           <div className="text-2xl font-bold text-[var(--color-primary)]">{achievements.length}</div>
-          <div className="text-xs text-[var(--color-text-body)] mt-1">Ачивок</div>
+          <div className="text-xs text-[var(--color-text-body)] mt-1">{t('stat_achievements')}</div>
         </div>
       </div>
 
@@ -400,17 +402,17 @@ function ProfilePage() {
               <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
                  <div className="text-center float-up-fade">
                     <div className="text-5xl mb-2 animate-bounce">⭐</div>
-                    <h3 className="text-xl font-black uppercase tracking-widest" style={{ color: rankInfo.color }}>НОВЫЙ РАНГ!</h3>
+                    <h3 className="text-xl font-black uppercase tracking-widest" style={{ color: rankInfo.color }}>{t('new_rank')}</h3>
                     <p className="text-sm font-bold text-gray-500 mt-1">{levelUpMessage}</p>
                  </div>
               </div>
             )}
 
             <h2 className="font-bold text-[var(--color-text-heading)] mb-4 flex items-center justify-between">
-              <span className="flex items-center gap-2">🏅 <span className="uppercase tracking-widest text-xs">Прогресс ранга</span></span>
+              <span className="flex items-center gap-2">🏅 <span className="uppercase tracking-widest text-xs">{t('rank_progress')}</span></span>
               {addedHours > 0 && (
                 <div className="text-emerald-700 font-black text-sm float-up-fade drop-shadow-sm bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-                  +{addedHours} часов! 🎉
+                  {t('added_hours').replace('{hours}', addedHours)}
                 </div>
               )}
             </h2>
@@ -420,7 +422,7 @@ function ProfilePage() {
               <button 
                 onClick={() => navigate('/ranks')}
                 className="flex flex-col items-center min-w-[70px] hover:scale-110 transition-transform"
-                title="Подробнее о рангах"
+                title={t('rank_details')}
               >
                 <div className="p-2 bg-gray-50 rounded-2xl transition-all" style={{ boxShadow: `0 4px 15px ${rankInfo.color}33`, border: `1px solid ${rankInfo.color}22` }}>{rankInfo.icon}</div>
                 <span className="text-[10px] font-bold mt-2 uppercase tracking-widest" style={{ color: rankInfo.color }}>{rankInfo.name}</span>
@@ -429,8 +431,8 @@ function ProfilePage() {
               {/* Progress bar */}
               <div className="flex-1">
                 <div className="flex justify-between text-[11px] text-[var(--color-text-body)] mb-2 font-black">
-                  <span style={{ color: rankInfo.color }}>{animatedHours} ч.</span>
-                  <span>{rankInfo.next ? `${rankInfo.hoursToNext} ч. до след.` : 'МАКСИМУМ!'}</span>
+                  <span style={{ color: rankInfo.color }}>{animatedHours} {t('stat_hours').toLowerCase()}</span>
+                  <span>{rankInfo.next ? t('hours_to_next').replace('{hours}', rankInfo.hoursToNext) : t('max_rank')}</span>
                 </div>
                 <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden relative shadow-inner">
                   <div
@@ -481,19 +483,19 @@ function ProfilePage() {
 
       {/* Achievements Section */}
       <div className="bg-white rounded-2xl card-shadow p-5">
-        <h2 className="font-bold text-[var(--color-text-heading)] mb-3">🏅 Достижения</h2>
+        <h2 className="font-bold text-[var(--color-text-heading)] mb-3">{t('achievements_title')}</h2>
         {achievements.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {achievements.map((a) => (
               <div key={a.id} className="bg-[var(--color-surface)] rounded-xl p-3 text-center border border-gray-100">
                 <span className="text-2xl">{a.achievements_catalog?.icon || '🏅'}</span>
-                <p className="text-xs text-[var(--color-text-heading)] mt-1 font-medium">{a.achievements_catalog?.title || 'Достижение'}</p>
+                <p className="text-xs text-[var(--color-text-heading)] mt-1 font-medium">{a.achievements_catalog?.title || t('achievement_default')}</p>
               </div>
             ))}
           </div>
         ) : (
           <p className="text-sm text-[var(--color-text-body)]">
-            Достижений пока нет 🎯
+            {t('no_achievements')}
           </p>
         )}
       </div>
@@ -501,25 +503,25 @@ function ProfilePage() {
       {/* Appreciation Letters Section */}
       <div className="bg-white rounded-2xl card-shadow p-5">
         <h2 className="font-bold text-[var(--color-text-heading)] mb-3 flex items-center gap-2">
-          <span>✉️ Благодарственные письма</span>
-          <span className="badge badge-sm bg-indigo-50 text-indigo-600 border-0">Новое</span>
+          <span>{t('letters_title')}</span>
+          <span className="badge badge-sm bg-indigo-50 text-indigo-600 border-0">{t('letter_new')}</span>
         </h2>
         <div className="space-y-3">
           {profile?.is_supporter && (
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-100 flex items-center gap-4 animate-in slide-in-from-left duration-700">
                <div className="text-3xl">📜</div>
                <div>
-                 <p className="text-sm font-bold text-yellow-800">Благодарность от разработчика</p>
-                 <p className="text-[10px] text-yellow-600 font-medium lowercase">«Твой вклад согревает моё сердце (и кофе). Спасибо, что ты с нами!»</p>
+                 <p className="text-sm font-bold text-yellow-800">{t('letter_dev_title')}</p>
+                 <p className="text-[10px] text-yellow-600 font-medium lowercase">{t('letter_dev_desc')}</p>
                </div>
                <div className="ml-auto text-[10px] font-bold text-yellow-400 uppercase tracking-widest">Official</div>
             </div>
           )}
           {(!profile?.is_supporter) && (
             <div className="bg-slate-50 rounded-xl p-8 text-center border-2 border-dashed border-slate-200">
-              <div className="text-4xl mb-3">✉️</div>
-              <p className="text-sm font-bold text-slate-500 mb-1">Писем пока нет</p>
-              <p className="text-xs text-slate-400">Здесь будут отображаться ваши официальные благодарности от координаторов</p>
+               <div className="text-4xl mb-3">✉️</div>
+               <p className="text-sm font-bold text-slate-500 mb-1">{t('no_letters_title')}</p>
+               <p className="text-xs text-slate-400">{t('no_letters_desc')}</p>
             </div>
           )}
         </div>
@@ -527,7 +529,7 @@ function ProfilePage() {
 
       {/* Recent Events */}
       <div className="bg-white rounded-2xl card-shadow p-5">
-        <h2 className="font-bold text-[var(--color-text-heading)] mb-3">📋 Участие в мероприятиях</h2>
+        <h2 className="font-bold text-[var(--color-text-heading)] mb-3">{t('participation_title')}</h2>
         {recentEvents.length > 0 ? (
           <div className="space-y-2">
             {recentEvents.map((ep) => (
@@ -544,14 +546,14 @@ function ProfilePage() {
                   ep.status === 'absent' ? 'bg-red-50 text-red-700' :
                   'bg-yellow-50 text-yellow-700'
                 }`}>
-                  {ep.status === 'attended' ? '✅ Был' : ep.status === 'absent' ? '❌ Пропуск' : '🕒 Записан'}
+                  {ep.status === 'attended' ? t('status_attended') : ep.status === 'absent' ? t('status_absent') : t('status_enrolled')}
                 </span>
               </div>
             ))}
           </div>
         ) : (
           <p className="text-sm text-[var(--color-text-body)]">
-            Мероприятий в списке нет.
+            {t('no_participations')}
           </p>
         )}
       </div>
@@ -560,35 +562,35 @@ function ProfilePage() {
       {isOwnProfile && isEditModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-gray-100 shadow-2xl">
-            <h2 className="text-xl font-bold mb-4 text-[var(--color-text-heading)]">Настройки профиля</h2>
+            <h2 className="text-xl font-bold mb-4 text-[var(--color-text-heading)]">{t('settings_title')}</h2>
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div className="flex flex-col items-center gap-2 mb-4">
                 <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden ring-2 ring-gray-50">
                   {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-2xl text-gray-400">👤</span>}
                 </div>
                 <label className="text-xs text-indigo-600 font-bold cursor-pointer hover:text-indigo-700 transition-colors">
-                  {uploading ? 'Загрузка...' : 'Изменить фото'}
+                  {uploading ? t('img_uploading') : t('img_change')}
                   <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
                 </label>
               </div>
               <div>
-                <label className="text-xs font-black text-gray-500 uppercase tracking-widest block mb-1">О себе</label>
+                <label className="text-xs font-black text-gray-500 uppercase tracking-widest block mb-1">{t('about_me')}</label>
                 <textarea 
                   value={editBio} 
                   onChange={(e) => setEditBio(e.target.value)} 
                   className="textarea textarea-bordered w-full rounded-2xl h-24 text-sm focus:border-indigo-500 transition-all" 
-                  placeholder="Расскажите о своем волонтерском пути..."
+                  placeholder={t('about_me_placeholder')}
                 />
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={saving} className="btn bg-indigo-600 hover:bg-indigo-700 text-white flex-1 rounded-2xl border-none shadow-lg shadow-indigo-100">
-                  {saving ? <span className="loading loading-spinner loading-xs"></span> : 'Сохранить'}
+                  {saving ? <span className="loading loading-spinner loading-xs"></span> : t('btn_save')}
                 </button>
-                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-ghost flex-1 rounded-2xl">Отмена</button>
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-ghost flex-1 rounded-2xl">{t('btn_cancel_edit')}</button>
               </div>
             </form>
             <div className="mt-8 pt-4 border-t border-gray-50 text-center">
-              <button onClick={async () => { if(confirm('Выйти из системы?')){ await signOut(); navigate('/login') }}} className="text-xs font-bold text-red-400 hover:text-red-600 transition-colors">🚪 Выйти из аккаунта</button>
+              <button onClick={async () => { if(confirm(t('logout_confirm'))){ await signOut(); navigate('/login') }}} className="text-xs font-bold text-red-400 hover:text-red-600 transition-colors">{t('btn_logout')}</button>
             </div>
           </div>
         </div>
@@ -599,8 +601,8 @@ function ProfilePage() {
           <div className="bg-white rounded-[2rem] p-8 max-w-xs w-full text-center relative shadow-2xl border border-gray-50 animate-modalfadein">
             <button onClick={() => setIsQRModalOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">✕</button>
             <div className="pt-2">
-              <h3 className="font-black text-xl mb-1 text-[var(--color-text-heading)]">Ваш Jas ID</h3>
-              <p className="text-[10px] uppercase font-black text-gray-400 mb-6 tracking-widest">Цифровой пропуск волонтера</p>
+              <h3 className="font-black text-xl mb-1 text-[var(--color-text-heading)]">{t('qr_title')}</h3>
+              <p className="text-[10px] uppercase font-black text-gray-400 mb-6 tracking-widest">{t('qr_desc')}</p>
               <div className="bg-white p-5 rounded-[2rem] border-2 border-gray-100 inline-block mb-6 shadow-inner">
                 <QRCodeSVG value={currentUser.id} size={180} fgColor="#3122b5" includeMargin={true} />
               </div>

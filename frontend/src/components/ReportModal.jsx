@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function ReportModal({ isOpen, onClose }) {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [category, setCategory] = useState('bug')
   const [content, setContent] = useState('')
   const [imageFile, setImageFile] = useState(null)
@@ -62,7 +64,7 @@ export default function ReportModal({ isOpen, onClose }) {
 
     } catch (err) {
       console.error('Error submitting report:', err)
-      alert('Ошибка при отправке: ' + err.message)
+      alert(t('err_send_report') + err.message)
     } finally {
       setLoading(false)
     }
@@ -77,41 +79,41 @@ export default function ReportModal({ isOpen, onClose }) {
         {success ? (
           <div className="text-center py-10">
             <div className="text-6xl mb-4">🚀</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Отправлено!</h2>
-            <p className="text-gray-600">Спасибо за помощь в улучшении проекта.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('report_success_title')}</h2>
+            <p className="text-gray-600">{t('report_success_desc')}</p>
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-brand text-gray-900 mb-2">Сообщить об ошибке</h2>
-            <p className="text-gray-600 text-sm mb-6">Заметили баг или есть жалоба? Напишите нам, мы разберемся.</p>
+            <h2 className="text-2xl font-brand text-gray-900 mb-2">{t('report_title')}</h2>
+            <p className="text-gray-600 text-sm mb-6">{t('report_subtitle')}</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-400 mb-2">Категория</label>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-2">{t('label_category')}</label>
                 <select 
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 >
-                  <option value="bug">🐛 Техническая ошибка</option>
-                  <option value="harassment">🚫 Нарушение правил / Оскорбление</option>
-                  <option value="other">❓ Другое</option>
+                  <option value="bug">{t('option_bug')}</option>
+                  <option value="harassment">{t('option_harassment')}</option>
+                  <option value="other">{t('option_other')}</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-400 mb-2">Описание</label>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-2">{t('label_desc_report')}</label>
                 <textarea 
                   required
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm h-32 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  placeholder="Что именно случилось? Чем подробнее, тем лучше..."
+                  placeholder={t('placeholder_desc_report')}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-400 mb-2">Скриншот (необязательно)</label>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-2">{t('label_screenshot_opt')}</label>
                 <input 
                   type="file" 
                   accept="image/*"
@@ -125,7 +127,7 @@ export default function ReportModal({ isOpen, onClose }) {
                 disabled={loading}
                 className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
               >
-                {loading ? 'Отправка...' : 'Отправить жалобу 🚀'}
+                {loading ? t('btn_sending') : t('btn_send_report')}
               </button>
             </form>
           </>

@@ -1,12 +1,26 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import CreateEventModal from '../components/CreateEventModal.jsx'
 import EditEventModal from '../components/EditEventModal.jsx'
 import LoadingScreen from '../components/LoadingScreen.jsx'
 
+const filterKeys = {
+  'Все': 'filter_all',
+  'Экология': 'filter_ecology',
+  'Животные': 'filter_animals',
+  'Образование': 'filter_education',
+  'Благотворительность': 'filter_charity',
+  'IT': 'filter_it',
+  'Творчество': 'filter_creative',
+  'Благоустройство': 'filter_improvement',
+  'Социальная помощь': 'filter_social'
+};
+
 function EventsPage() {
   const { user, profile } = useAuth()
+  const { t } = useLanguage()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('Все')
@@ -63,7 +77,7 @@ function EventsPage() {
          setJoinedEventWhatsApp(eventJoined.whatsapp_link)
       }
     } else {
-      alert('Ошибка при записи на мероприятие.')
+      alert(t('err_register'))
     }
     setRegistering(null)
   }
@@ -75,7 +89,7 @@ function EventsPage() {
     const hoursDifference = (eventDate - new Date()) / (1000 * 60 * 60)
     
     if (hoursDifference < 24) {
-      alert('Отменить запись можно не позднее чем за 24 часа до начала мероприятия!')
+      alert(t('err_cancel_time'))
       return
     }
 
@@ -95,7 +109,7 @@ function EventsPage() {
       .eq('user_id', user.id)
     
     if (!error) await fetchEvents()
-    else alert('Ошибка при отмене записи. Возможно, нет прав на удаление записи в базе данных.')
+    else alert(t('err_cancel_db'))
   }
 
   async function executeCancelEvent() {
@@ -111,7 +125,7 @@ function EventsPage() {
       setIsCancelModalOpen(false)
       setEventToCancel(null)
     } else {
-      alert('Ошибка при отмене мероприятия.')
+      alert(t('err_delete'))
     }
   }
 
@@ -126,7 +140,7 @@ function EventsPage() {
     const hoursDifference = (eventDate - new Date()) / (1000 * 60 * 60)
     
     if (hoursDifference < 24) {
-      alert('Редактировать мероприятие можно не позднее чем за 24 часа до начала!')
+      alert(t('err_edit_time'))
       return
     }
     setEventToEdit(event)
@@ -153,13 +167,13 @@ function EventsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[var(--color-text-heading)]">📋 Все мероприятия</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text-heading)]">{t('events_page_title')}</h1>
         {canCreate && (
           <button 
             onClick={() => setIsCreateModalOpen(true)} 
             className="btn bg-[var(--color-primary)] text-white hover:bg-red-800 border-none rounded-xl shadow-md px-6 font-black uppercase tracking-widest text-xs"
           >
-            ➕ Создать
+            {t('btn_create')}
           </button>
         )}
       </div>
@@ -184,23 +198,23 @@ function EventsPage() {
             <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
               🗑️
             </div>
-            <h3 className="text-2xl font-black text-[var(--color-text-heading)] mb-3">Удалить проект?</h3>
+            <h3 className="text-2xl font-black text-[var(--color-text-heading)] mb-3">{t('delete_modal_title')}</h3>
             <p className="text-[var(--color-text-body)] mb-8 leading-relaxed">
-              Вы уверены, что хотите полностью отменить мероприятие <span className="font-bold text-red-600">«{eventToCancel?.title}»</span>? 
-              Это действие нельзя будет отменить.
+              {t('delete_modal_desc')} <span className="font-bold text-red-600">«{eventToCancel?.title}»</span>? 
+              {t('delete_modal_desc2')}
             </p>
             <div className="flex flex-col gap-3">
               <button 
                 onClick={executeCancelEvent}
                 className="btn h-14 bg-red-600 hover:bg-red-700 text-white border-none rounded-2xl font-black uppercase tracking-widest text-xs"
               >
-                Да, отменить проект
+                {t('delete_modal_yes')}
               </button>
               <button 
                 onClick={() => { setIsCancelModalOpen(false); setEventToCancel(null); }}
                 className="btn h-14 btn-ghost text-[var(--color-text-body)] rounded-2xl font-bold"
               >
-                Нет, оставить
+                {t('delete_modal_no')}
               </button>
             </div>
           </div>
@@ -211,7 +225,7 @@ function EventsPage() {
       <div className="bg-white rounded-2xl card-shadow p-4 space-y-3">
         <input
           type="text"
-          placeholder="🔍 Поиск по названию или команде..."
+          placeholder={t('search_placeholder')}
           className="input input-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200 focus:border-[var(--color-primary)] focus:outline-none"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -228,14 +242,14 @@ function EventsPage() {
                   : 'bg-[var(--color-surface-2)] text-[var(--color-text-body)] hover:bg-gray-200'
               }`}
             >
-              {f}
+              {t(filterKeys[f] || f)}
             </button>
           ))}
         </div>
       </div>
 
       {/* Loading */}
-      {loading && <LoadingScreen message="Поиск ближайших добрых дел..." />}
+      {loading && <LoadingScreen message={t('loading_events')} />}
 
       {/* Events List */}
       {!loading && (
@@ -243,7 +257,7 @@ function EventsPage() {
           {displayEvents.length === 0 && (
             <div className="bg-white rounded-2xl card-shadow p-10 text-center">
               <div className="text-5xl mb-3">🔍</div>
-              <p className="text-[var(--color-text-body)]">Мероприятий не найдено.</p>
+              <p className="text-[var(--color-text-body)]">{t('not_found_events')}</p>
             </div>
           )}
 
@@ -263,7 +277,7 @@ function EventsPage() {
                 {/* Множитель Часов (Epic Badge) */}
                 {event.hours_multiplier && event.hours_multiplier > 1 && (
                   <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-400 to-[#FF4500] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg rotate-2 z-10 animate-bounce-subtle border border-white/30 backdrop-blur-sm">
-                    ⚡ {event.hours_multiplier}X ЧАСОВ!
+                    {t('badge_hours_multiplier').replace('{multiplier}', event.hours_multiplier)}
                   </div>
                 )}
                 
@@ -305,9 +319,9 @@ function EventsPage() {
                         </p>
                       </div>
                       {isRegistered ? (
-                        <span className="badge bg-green-50 text-green-700 border-0 rounded-lg whitespace-nowrap">✅ Записан</span>
+                        <span className="badge bg-green-50 text-green-700 border-0 rounded-lg whitespace-nowrap">{t('badge_registered')}</span>
                       ) : isFull ? (
-                        <span className="badge bg-gray-200 text-[var(--color-text-body)] border-0 rounded-lg whitespace-nowrap">Мест нет</span>
+                        <span className="badge bg-gray-200 text-[var(--color-text-body)] border-0 rounded-lg whitespace-nowrap">{t('badge_no_spots')}</span>
                       ) : (
                         <div className="flex items-center gap-2">
                           {(profile?.role === 'coordinator' || profile?.role === 'sub_coordinator') && event.team_id === profile?.team_id && (
@@ -315,20 +329,20 @@ function EventsPage() {
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleEditClick(event) }} 
                                   className="btn btn-xs btn-ghost text-indigo-500 hover:bg-indigo-50 rounded-lg"
-                                  title="Редактировать"
+                                  title={t('btn_edit')}
                                 >
                                   ✏️
                                 </button>
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleCancelClick(event) }} 
                                   className="btn btn-xs btn-ghost text-red-400 hover:bg-red-50 rounded-lg"
-                                  title="Отменить полностью"
+                                  title={t('btn_delete_full')}
                                 >
                                   🗑️
                                 </button>
                              </div>
                           )}
-                          <span className="badge bg-green-50 text-green-700 border-0 rounded-lg whitespace-nowrap">Есть места</span>
+                          <span className="badge bg-green-50 text-green-700 border-0 rounded-lg whitespace-nowrap">{t('badge_has_spots')}</span>
                         </div>
                       )}
                     </div>
@@ -353,15 +367,15 @@ function EventsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex-1 mr-4">
                         <div className="flex justify-between text-xs text-[var(--color-text-body)] mb-1">
-                          <span>Записалось</span>
+                          <span>{t('event_enrolled')}</span>
                           <span>{spots}/{maxSpots}</span>
                         </div>
                         <progress className="progress progress-error w-full h-2" value={spots} max={maxSpots} />
                       </div>
                       {isRegistered ? (
                         <div className="flex flex-col md:flex-row items-center gap-2 shrink-0">
-                           <button onClick={(e) => { e.stopPropagation(); handleLeaveClick(event) }} className="btn btn-sm btn-ghost text-red-400 hover:bg-red-50 hover:text-red-500 rounded-xl whitespace-nowrap"> Отменить ❌</button>
-                           <span className="btn btn-sm btn-disabled rounded-xl bg-green-100 text-green-800 font-bold border-none px-4">Вы записаны ✅</span>
+                           <button onClick={(e) => { e.stopPropagation(); handleLeaveClick(event) }} className="btn btn-sm btn-ghost text-red-400 hover:bg-red-50 hover:text-red-500 rounded-xl whitespace-nowrap">{t('btn_cancel')}</button>
+                           <span className="btn btn-sm btn-disabled rounded-xl bg-green-100 text-green-800 font-bold border-none px-4">{t('btn_you_registered')}</span>
                         </div>
                       ) : (
                         <button
@@ -371,7 +385,7 @@ function EventsPage() {
                         >
                           {registering === event.id ? (
                             <span className="loading loading-spinner loading-xs"></span>
-                          ) : isFull ? 'Мест нет' : 'Записаться'}
+                          ) : isFull ? t('badge_no_spots') : t('event_btn_enroll')}
                         </button>
                       )}
                     </div>
@@ -380,7 +394,7 @@ function EventsPage() {
                     {isRegistered && event.whatsapp_link && (
                       <div className="mt-4 pt-4 border-t border-green-100 w-full animate-fade-in">
                          <a href={event.whatsapp_link} target="_blank" rel="noopener noreferrer" className="btn w-full bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-lg border-none flex items-center justify-center gap-2">
-                            <span className="text-xl">💬</span> <span className="font-black uppercase tracking-widest text-xs truncate">Группа мероприятия в WhatsApp</span>
+                            <span className="text-xl">💬</span> <span className="font-black uppercase tracking-widest text-xs truncate">{t('wa_group_btn')}</span>
                          </a>
                       </div>
                     )}
@@ -396,14 +410,14 @@ function EventsPage() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center relative card-shadow animate-fade-in-up">
              <div className="text-6xl mb-4 animate-bounce">💚</div>
-             <h2 className="text-2xl font-black text-gray-900 mb-2">Отлично! Вы в деле!</h2>
-             <p className="text-gray-600 mb-6 text-sm leading-relaxed">Вам нужно присоединиться к чату участников, чтобы быть в курсе всех новостей, времени сбора и связи с организатором.</p>
+             <h2 className="text-2xl font-black text-gray-900 mb-2">{t('wa_modal_title')}</h2>
+             <p className="text-gray-600 mb-6 text-sm leading-relaxed">{t('wa_modal_desc')}</p>
              <div className="flex flex-col gap-3">
                <a href={joinedEventWhatsApp} target="_blank" rel="noopener noreferrer" className="btn bg-green-500 hover:bg-green-600 border-none text-white rounded-xl w-full font-black uppercase tracking-widest relative overflow-hidden">
                   <span className="absolute inset-0 bg-white/20 hover:animate-ping opacity-0 hover:opacity-100 transition-opacity"></span>
-                  📞 Перейти в WhatsApp
+                  {t('wa_modal_go')}
                </a>
-               <button onClick={() => setJoinedEventWhatsApp(null)} className="btn btn-ghost rounded-xl w-full text-gray-400">Позже</button>
+               <button onClick={() => setJoinedEventWhatsApp(null)} className="btn btn-ghost rounded-xl w-full text-gray-400">{t('wa_modal_later')}</button>
              </div>
           </div>
         </div>
@@ -414,17 +428,17 @@ function EventsPage() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center relative card-shadow animate-scale-in">
              <div className="text-6xl mb-4">💔</div>
-             <h2 className="text-2xl font-black text-gray-900 mb-2">Отменить запись?</h2>
+             <h2 className="text-2xl font-black text-gray-900 mb-2">{t('cancel_modal_title')}</h2>
              <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-               Вы действительно не сможете принять участие в проекте <br/>
+               {t('cancel_modal_desc')} <br/>
                <span className="font-bold text-gray-800">«{leaveConfirmEvent.title}»</span>?
              </p>
              <div className="flex flex-col gap-3">
                <button onClick={() => setLeaveConfirmEvent(null)} className="btn bg-green-500 hover:bg-green-600 border-none text-white rounded-xl w-full font-bold">
-                  Нет, я пойду!
+                  {t('cancel_modal_no')}
                </button>
                <button onClick={executeLeaveEvent} className="btn btn-ghost rounded-xl w-full text-red-500 font-bold">
-                  Да, отменить запись
+                  {t('cancel_modal_yes')}
                </button>
              </div>
           </div>

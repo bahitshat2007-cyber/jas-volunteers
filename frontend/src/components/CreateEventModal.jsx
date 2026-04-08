@@ -1,13 +1,25 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 const EMOJI_LIST = ['📋','🌳','🐾','🎨','🍞','💻','🧹','🏥','🏠','🏗️','🔥','⚡','🎤','🌟','🏆','🚀','💡','🌍','🤝','❤️','💪','🛠️','🎓','🎁','⚽','🎸','🎭','🌿','🌈']
 const MULTIPLIERS = [1, 2, 3, 4, 5]
-const AVAILABLE_TAGS = ['Экология', 'Животные', 'Образование', 'Благотворительность', 'IT', 'Творчество', 'Благоустройство', 'Социальная помощь']
+const TAGS_MAP = {
+  'Экология': 'filter_ecology',
+  'Животные': 'filter_animals',
+  'Образование': 'filter_education',
+  'Благотворительность': 'filter_charity',
+  'IT': 'filter_it',
+  'Творчество': 'filter_creative',
+  'Благоустройство': 'filter_improvement',
+  'Социальная помощь': 'filter_social'
+}
+const AVAILABLE_TAGS = Object.keys(TAGS_MAP)
 
 function CreateEventModal({ isOpen, onClose, onSuccess }) {
   const { user, profile } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
@@ -42,7 +54,7 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!profile?.team_id) {
-      alert('Ошибка: Вы не состоите в команде.')
+      alert(t('err_no_team'))
       return
     }
 
@@ -69,7 +81,7 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
       onSuccess()
       onClose()
     } catch (err) {
-      alert('Ошибка при создании проекта: ' + err.message)
+      alert(t('err_create_event') + err.message)
     } finally {
       setLoading(false)
     }
@@ -80,7 +92,7 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
       <div className="bg-white rounded-3xl w-full max-w-lg card-shadow max-h-[90vh] flex flex-col animate-fade-in-up">
         {/* Header */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[var(--color-surface)] rounded-t-3xl">
-          <h2 className="text-xl font-bold text-[var(--color-text-heading)]">✨ Создать мероприятие</h2>
+          <h2 className="text-xl font-bold text-[var(--color-text-heading)]">{t('create_event_title')}</h2>
           <button onClick={onClose} className="btn btn-circle btn-sm btn-ghost">✕</button>
         </div>
 
@@ -89,49 +101,49 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
           <form id="create-event-form" onSubmit={handleSubmit} className="space-y-5">
             
             <div className="form-control">
-              <label className="label font-bold text-[var(--color-text-heading)] py-1">Название проекта / акции</label>
+              <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_event_title')}</label>
               <input 
                 required 
                 type="text" 
                 name="title"
                 value={formData.title} 
                 onChange={handleChange}
-                placeholder="Например: Посадка деревьев" 
+                placeholder={t('placeholder_event_title')} 
                 className="input bg-[var(--color-surface)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)]" 
               />
             </div>
 
             <div className="form-control">
-              <label className="label font-bold text-[var(--color-text-heading)] py-1">Описание</label>
+              <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_desc')}</label>
               <textarea 
                 required 
                 name="description"
                 value={formData.description} 
                 onChange={handleChange}
-                placeholder="Что нужно делать волонтёрам?" 
+                placeholder={t('placeholder_desc')} 
                 className="textarea bg-[var(--color-surface)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-24 resize-none" 
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label font-bold text-[var(--color-text-heading)] py-1 flex items-center gap-1">Эмодзи</label>
+                <label className="label font-bold text-[var(--color-text-heading)] py-1 flex items-center gap-1">{t('label_emoji')}</label>
                 <select name="emoji" value={formData.emoji} onChange={handleChange} className="select bg-[var(--color-surface)] border-none rounded-xl text-2xl">
                   {EMOJI_LIST.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
               <div className="form-control">
-                <label className="label font-bold text-[var(--color-text-heading)] py-1 text-[11px] uppercase tracking-widest text-[var(--color-primary)]">Множитель часов</label>
+                <label className="label font-bold text-[var(--color-text-heading)] py-1 text-[11px] uppercase tracking-widest text-[var(--color-primary)]">{t('label_hours_multiplier')}</label>
                 <select name="hours_multiplier" value={formData.hours_multiplier} onChange={handleChange} className="select bg-red-50 text-[var(--color-primary)] border-none rounded-xl font-black">
                   {MULTIPLIERS.map(m => (
-                    <option key={m} value={m}>{m === 1 ? '1X (Стандарт)' : `⚡ ${m}X ЧАСОВ`}</option>
+                    <option key={m} value={m}>{m === 1 ? t('option_standard') : t('badge_hours_multiplier').replace('{multiplier}', m)}</option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="form-control">
-              <label className="label font-bold text-[var(--color-text-heading)] py-1">Теги категории</label>
+              <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_tags')}</label>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_TAGS.map(tag => (
                   <button
@@ -140,7 +152,7 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
                     onClick={() => toggleTag(tag)}
                     className={`badge badge-lg border-0 transition-all cursor-pointer ${formData.tags.includes(tag) ? 'bg-[var(--color-primary)] text-white scale-105' : 'bg-[var(--color-surface-2)] text-[var(--color-text-body)] hover:bg-gray-200'}`}
                   >
-                    {tag}
+                    {t(TAGS_MAP[tag])}
                   </button>
                 ))}
               </div>
@@ -148,18 +160,18 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label font-bold text-[var(--color-text-heading)] py-1">Дата</label>
+                <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_date')}</label>
                 <input required type="date" name="event_date" value={formData.event_date} onChange={handleChange} className="input bg-[var(--color-surface)] border-none rounded-xl" />
               </div>
               <div className="form-control">
-                <label className="label font-bold text-[var(--color-text-heading)] py-1">Число мест</label>
+                <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_spots')}</label>
                 <input required type="number" name="max_participants" min="1" value={formData.max_participants} onChange={handleChange} className="input bg-[var(--color-surface)] border-none rounded-xl" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label font-bold text-[var(--color-text-heading)] py-1">Начало</label>
+                <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_start')}</label>
                 <div className="flex items-center gap-1">
                   <select 
                     required
@@ -187,7 +199,7 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
               </div>
               
               <div className="form-control">
-                <label className="label font-bold text-[var(--color-text-heading)] py-1">Конец</label>
+                <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_end')}</label>
                 <div className="flex items-center gap-1">
                   <select 
                     value={formData.end_time?.split(':')[0] || ''} 
@@ -214,13 +226,13 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
             </div>
 
             <div className="form-control">
-              <label className="label font-bold text-[var(--color-text-heading)] py-1">Ссылка на WhatsApp-группу (необязательно)</label>
+              <label className="label font-bold text-[var(--color-text-heading)] py-1">{t('label_wa_link')}</label>
               <input 
                 type="url" 
                 name="whatsapp_link"
                 value={formData.whatsapp_link} 
                 onChange={handleChange}
-                placeholder="https://chat.whatsapp.com/..." 
+                placeholder={t('placeholder_wa_link')} 
                 className="input bg-[var(--color-surface)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] placeholder-gray-400" 
               />
             </div>
@@ -230,9 +242,9 @@ function CreateEventModal({ isOpen, onClose, onSuccess }) {
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-100 flex gap-3 justify-end rounded-b-3xl bg-[var(--color-surface)]">
-          <button type="button" onClick={onClose} disabled={loading} className="btn btn-ghost rounded-xl">Отмена</button>
+          <button type="button" onClick={onClose} disabled={loading} className="btn btn-ghost rounded-xl">{t('btn_cancel_modal')}</button>
           <button type="submit" form="create-event-form" disabled={loading} className="btn bg-[var(--color-primary)] hover:bg-red-800 text-white rounded-xl px-8 border-none">
-            {loading ? <span className="loading loading-spinner loading-sm"></span> : 'Сохранить и опубликовать'}
+            {loading ? <span className="loading loading-spinner loading-sm"></span> : t('btn_save_publish')}
           </button>
         </div>
       </div>

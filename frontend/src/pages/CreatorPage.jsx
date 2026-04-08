@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-const PERSONAS = [
-  { id: 'politician', title: 'Стратег ', desc: 'Жесткий политик и лидер', image: '/creator/politician.png', color: 'from-blue-600 to-indigo-900', border: 'border-blue-400', scale: 1.05, extraStyle: { translate: '0 -47px' } },
-  { id: 'femboy', title: 'Kawaii Душа', desc: 'Милый фурри фембой', image: '/creator/femboy.png', color: 'from-pink-400 to-rose-600', border: 'border-pink-300' },
-  { id: 'wrestler', title: 'Борцуха', desc: 'Несгибаемый вольник', image: '/creator/wrestler.png', color: 'from-red-600 to-orange-900', border: 'border-red-500' },
-  { id: 'entrepreneur', title: 'Предприниматель', desc: 'ПП десерты и бизнес SaveHeal foods', image: '/creator/entrepreneur.png', color: 'from-green-500 to-emerald-800', border: 'border-green-400' },
-  { id: 'scientist', title: 'Ученый-Гений', desc: 'Мудрость и наука', image: '/creator/scientist.png', color: 'from-cyan-500 to-blue-800', border: 'border-cyan-400', scale: 1.3, extraStyle: { translate: '0 -20px' } },
-  { id: 'mrrobot', title: 'Mr. Robot', desc: 'Элитный хакер системы', image: '/creator/mrrobot.png', color: 'from-gray-800 to-gray-950', border: 'border-gray-500', scale: 1.1, extraStyle: { translate: '0 -50px' } },
-]
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export default function CreatorPage() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
+
+  const PERSONAS = [
+    { id: 'politician', title: t('persona_politician_title'), desc: t('persona_politician_desc'), image: '/creator/politician.png', color: 'from-blue-600 to-indigo-900', border: 'border-blue-400', scale: 1.05, extraStyle: { translate: '0 -47px' } },
+    { id: 'femboy', title: t('persona_femboy_title'), desc: t('persona_femboy_desc'), image: '/creator/femboy.png', color: 'from-pink-400 to-rose-600', border: 'border-pink-300' },
+    { id: 'wrestler', title: t('persona_wrestler_title'), desc: t('persona_wrestler_desc'), image: '/creator/wrestler.png', color: 'from-red-600 to-orange-900', border: 'border-red-500' },
+    { id: 'entrepreneur', title: t('persona_entrepreneur_title'), desc: t('persona_entrepreneur_desc'), image: '/creator/entrepreneur.png', color: 'from-green-500 to-emerald-800', border: 'border-green-400' },
+    { id: 'scientist', title: t('persona_scientist_title'), desc: t('persona_scientist_desc'), image: '/creator/scientist.png', color: 'from-cyan-500 to-blue-800', border: 'border-cyan-400', scale: 1.3, extraStyle: { translate: '0 -20px' } },
+    { id: 'mrrobot', title: t('persona_mrrobot_title'), desc: t('persona_mrrobot_desc'), image: '/creator/mrrobot.png', color: 'from-gray-800 to-gray-950', border: 'border-gray-500', scale: 1.1, extraStyle: { translate: '0 -50px' } },
+  ]
+
   const [cards, setCards] = useState([])
   const [flipped, setFlipped] = useState([])
   const [solved, setSolved] = useState([])
@@ -162,7 +166,7 @@ export default function CreatorPage() {
               <br />
               <p className="mb-4 text-green-300 animate-pulse">CRITICAL FAULT. SYSTEM IN unstable STATE.</p>
               <div className="flex items-center gap-2">
-                  <span>Перезагрузить сайт? [Y/n]:</span>
+                  <span>{t('terminal_prompt')}</span>
                   <input
                       ref={terminalInputRef}
                       type="text"
@@ -341,11 +345,11 @@ export default function CreatorPage() {
 
       {/* Hero Section */}
       <div className="relative pt-32 pb-20 px-4 text-center z-10 transition-transform" style={{ filter: `blur(${glitchIntensity * 4}px)` }}>
-        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 glitch-wrapper uppercase" data-text="Знакомьтесь, Создатель">
-          Знакомьтесь, Создатель
+        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 glitch-wrapper uppercase" data-text={t('creator_hero_title')}>
+          {t('creator_hero_title')}
         </h1>
         <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto font-light mb-12">
-          Архитектор Jas Volunteers. Экспериментатор. Многогранная личность. Откройте все мои альтер-эго.
+          {t('creator_hero_desc')}
         </p>
       </div>
 
@@ -382,9 +386,9 @@ export default function CreatorPage() {
       <div className="max-w-5xl mx-auto px-4 py-20 w-full z-10 relative">
         <div className="text-center mb-10">
           <h2 className="text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            Игра: Грани Личности
+            {t('creator_game_title')}
           </h2>
-          <p className="text-gray-400 font-mono">Сможешь найти две одинаковые стороны моего характера? <br/> Ходов сделано: {moves}</p>
+          <p className="text-gray-400 font-mono">{t('creator_game_desc')} <br/> {t('creator_moves')}: {moves}</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-4xl mx-auto">
@@ -415,7 +419,7 @@ export default function CreatorPage() {
         
         {solved.length === cards.length && cards.length > 0 && (
            <div className="mt-12 text-center animate-bounce">
-            <h3 className="text-2xl font-black text-green-400 uppercase tracking-widest">Цикл Завершен</h3>
+            <h3 className="text-2xl font-black text-green-400 uppercase tracking-widest">{t('creator_cycle_complete')}</h3>
           </div>
         )}
       </div>
@@ -424,11 +428,10 @@ export default function CreatorPage() {
       <div className="w-full h-[60vh] mt-20 flex flex-col items-center justify-center p-4 relative group cursor-crosshair overflow-hidden" style={{ background: `rgba(150,0,0,${glitchIntensity * 0.4})` }}>
         <div className="text-center z-10">
           <h2 className="text-5xl md:text-7xl font-black text-white mix-blend-difference uppercase drop-shadow-[0_0_20px_red]" style={{ transform: `scale(${1 + glitchIntensity * 0.3})`, opacity: glitchIntensity * 1.5 }}>
-            БЕГИ ИЛИ МИР РУХНЕТ
+            {t('creator_danger_title')}
           </h2>
           <p className="mt-6 text-red-400 font-mono text-lg max-w-lg mx-auto bg-black/50 p-4" style={{ opacity: glitchIntensity }}>
-            СИСТЕМА ПЕРЕГРУЖЕНА. ЭМУЛЯЦИЯ НЕ ВЫДЕРЖИТ СТОЛЬКО ЛИЧНОСТЕЙ ВОЕДИНО.
-            ВЫХОДИ НАВЕРХ ИЛИ МАТРИЦА СЛОМАЕТСЯ ОКОНЧАТЕЛЬНО.
+            {t('creator_danger_desc')}
           </p>
         </div>
       </div>
