@@ -291,7 +291,7 @@ function ProfilePage() {
           </div>
 
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-[var(--color-text-heading)] flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-[var(--color-text-heading)] flex items-center justify-center sm:justify-start gap-2">
               <span className={profile?.is_supporter ? 'text-golden' : ''}>
                 {displayName} {displayLastName}
               </span>

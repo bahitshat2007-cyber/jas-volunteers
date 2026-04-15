@@ -177,7 +177,7 @@ function RegisterPage() {
         {success && <div className="bg-green-50 text-green-700 rounded-xl px-4 py-3 text-sm mb-4">{success}</div>}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium mb-1 block">{t('label_fn_cyrillic')}</label>
               <input type="text" placeholder="Айдар" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="input input-bordered w-full rounded-xl bg-[var(--color-surface)] border-gray-200" required />
@@ -188,7 +188,7 @@ function RegisterPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium mb-1 block text-indigo-600 font-bold">{t('label_fn_latin')}</label>
               <input type="text" placeholder="Aidar" value={firstNameEn} onChange={handleLatinChange(setFirstNameEn)} className="input input-bordered w-full rounded-xl bg-indigo-50 border-indigo-200" required />

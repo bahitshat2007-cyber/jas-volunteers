@@ -438,7 +438,7 @@ export const translations = {
 
     // Creator Page
     creator_hero_title: 'Знакомьтесь, Создатель',
-    creator_hero_desc: 'Архитектор Jas Volunteers. Экспериментатор. Многогранная личность. Откройте все мои альтер-эго.',
+    creator_hero_desc: 'Откройте все мои альтер-эго.',
     creator_game_title: 'Игра: Грани Личности',
     creator_game_desc: 'Сможешь найти две одинаковые стороны моего характера?',
     creator_moves: 'Ходов сделано',
