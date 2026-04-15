@@ -155,6 +155,12 @@ function RegisterPage() {
     }
 
     setSuccess(t('success_register'))
+    
+    // Auto-navigate to profile after a short delay for feedback
+    setTimeout(() => {
+      navigate('/profile')
+    }, 1500)
+    
     setLoading(false)
   }
 
