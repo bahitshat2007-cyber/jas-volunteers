@@ -102,6 +102,9 @@ function Layout() {
           <p className="flex items-center justify-center md:justify-start gap-1.5">{t('footer_rights')} <SakuraEasterEgg /></p>
           <div className="flex flex-wrap justify-center items-center gap-4">
             <NavLink to="/creator" className="text-xs px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-md hover:scale-105 transition-transform">{t('footer_creator')}</NavLink>
+            <a href="https://www.tiktok.com/@gazievbahitshat?_r=1&_t=ZS-95YmGvByZBi" target="_blank" rel="noopener noreferrer" className="text-xs px-3 py-1 bg-[#010101] text-white font-bold rounded-lg shadow-md hover:shadow-[#00f7ef]/30 hover:scale-105 transition-all border border-white/10">
+              {t('footer_tiktok')}
+            </a>
             <button onClick={() => setIsReportOpen(true)} className="btn-jas-ghost text-xs px-2 py-1">{t('footer_bug')}</button>
             <button onClick={() => setIsSupportOpen(true)} className="btn-jas-ghost text-xs px-2 py-1 font-bold text-[var(--color-primary)]">{t('footer_support')}</button>
           </div>

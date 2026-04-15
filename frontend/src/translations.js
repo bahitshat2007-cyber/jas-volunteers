@@ -11,6 +11,7 @@ export const translations = {
     footer_creator: '✨ Создатель платформы',
     footer_bug: 'Сообщить об ошибке 🐛',
     footer_support: 'Поддержать проект ❤️',
+    footer_tiktok: 'TikTok Разработчика 🎵',
 
     // HomePage
     badge_volunteer_platform: '🇰🇿 Волонтёрская платформа',
@@ -470,6 +471,7 @@ export const translations = {
     footer_creator: '✨ Платформа жасаушысы',
     footer_bug: 'Қатені хабарлау 🐛',
     footer_support: 'Жобаны қолдау ❤️',
+    footer_tiktok: 'Әзірлеушінің TikTok-ы 🎵',
 
     // HomePage
     badge_volunteer_platform: '🇰🇿 Волонтерлік платформа',
@@ -1319,6 +1321,7 @@ export const translations = {
     success_thanks_desc: 'Meow! Your support has arrived. As soon as I confirm the transfer, a **special Aura** will appear in your profile! ✨',
     btn_babah: 'Ka-boom! ❤️',
     footer_made_in_kz: 'JAS VOLUNTEERS — MADE WITH LOVE IN KAZAKHSTAN 🇰🇿',
+    footer_tiktok: 'Developer\'s TikTok 🎵',
 
     // Report Modal
     err_send_report: 'Error sending: ',
