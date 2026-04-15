@@ -274,21 +274,18 @@ function ProfilePage() {
   return (
     <div className="space-y-6">
       {/* Profile Card */}
-      <div className={`rounded-2xl card-shadow p-6 transition-all duration-700 ${profile?.is_supporter ? 'supporter-card-premium bg-white' : 'bg-white'}`}>
+      <div className="rounded-2xl card-shadow p-6 transition-all duration-700 bg-white">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
           {/* Avatar Area */}
           <div className="relative group">
-            <div className={`w-24 h-24 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-4xl font-bold ring-4 ring-[var(--color-surface)] overflow-hidden relative z-10 ${profile?.is_supporter ? 'supporter-aura-ring' : ''}`}>
+            <div className="w-24 h-24 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-4xl font-bold ring-4 ring-[var(--color-surface)] overflow-hidden relative z-10">
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
                 (profile?.first_name?.[0] || '?').toUpperCase()
               )}
             </div>
-            {profile?.is_supporter && (
-              <div className="absolute inset-[-8px] rounded-full bg-gradient-to-tr from-yellow-400 via-orange-500 to-yellow-400 opacity-40 blur-md animate-pulse z-0"></div>
-            )}
-          </div>
+            </div>
 
           <div className="flex-1 text-center sm:text-left">
             <h1 className="text-2xl font-bold text-[var(--color-text-heading)] flex items-center justify-center sm:justify-start gap-2">
